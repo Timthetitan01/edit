@@ -1,0 +1,21 @@
+This file tells Git which files and folders to ignore.
+
+Firebase
+
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+
+Node.js (inside your finc folder)
+
+This is the most important one!
+
+finc/node_modules/
+
+Mac system files
+
+.DS_Store
+
+General log files
+
+*.log

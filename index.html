@@ -1,0 +1,1470 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor</title>
+    
+    <style>
+        /* ... all your CSS styles ... */
+        /* * ========================================
+         * CSS VARIABLES (THEME & TOKENS)
+         * ========================================
+         */
+        :root {
+            --bg-dark: #0a0f1a; /* Deep navy background */
+            --bg-medium: #1a2035; /* Card background */
+            --bg-light: #2a3045; /* Lighter BG for emphasis */
+            --text-light: #e0e8ff; /* Primary text */
+            --text-medium: #a0aec0; /* Subtitles, muted text */
+            --border-color: #2a3045; /* Borders */
+            
+            --accent-blue: #3a86ff; /* Primary CTA and accent */
+            --accent-blue-hover: #0056e0; /* Hover state for blue */
+            
+            --highlight-yellow: #ffbe0b; /* For "Recommended" tags, urgency bar */
+            --highlight-yellow-dark: #332600; /* Dark text for yellow bg */
+
+            --success-green: #4ade80;
+            --error-red: #f44336;
+            --guarantee-bg: #162a4a;
+
+            --font-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+            
+            --shadow-sm: 0 4px 10px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.4);
+            --shadow-blue: 0 8px 25px rgba(58, 134, 255, 0.2);
+
+            --radius-md: 8px;
+            --radius-lg: 12px;
+        }
+
+        /* * ========================================
+         * BASE & RESET STYLES
+         * ========================================
+         */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-system);
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            font-size: 16px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            padding-top: 70px; /* Offset for sticky nav */
+        }
+
+        /* Accessibility: Visible Focus Styles */
+        :focus-visible {
+            outline: 3px solid var(--accent-blue);
+            outline-offset: 2px;
+        }
+
+        /* * ========================================
+         * TYPOGRAPHY & UTILITIES
+         * ========================================
+         */
+        h1, h2, h3, h4 {
+            line-height: 1.2;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 4rem); /* Responsive font size */
+            /* Gradient text for hero headline */
+            background: linear-gradient(90deg, #ffffff, var(--accent-blue), #93c5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+            color: var(--text-light); /* Fallback */
+        }
+
+        h2 {
+            font-size: clamp(2rem, 5vw, 2.5rem);
+            color: var(--text-light);
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            color: var(--text-light);
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+            color: var(--text-medium);
+            max-width: 65ch; /* Improve readability */
+        }
+        
+        a {
+            color: var(--accent-blue);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        a:hover {
+            color: var(--accent-blue-hover);
+            text-decoration: underline;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .section-header h2 {
+            margin-bottom: 0.5rem;
+        }
+        .section-header p {
+            margin: 0 auto;
+            font-size: 1.1rem;
+        }
+
+        /* * ========================================
+         * BUTTONS (CTAs)
+         * ========================================
+         */
+        .cta-button {
+            display: inline-block;
+            font-family: var(--font-system);
+            font-size: 1rem;
+            font-weight: 700;
+            padding: 0.85rem 2rem;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.2s ease-in-out;
+            white-space: nowrap;
+        }
+        
+        .cta-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .cta-primary {
+            background-color: var(--accent-blue);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(58, 134, 255, 0.3);
+        }
+        .cta-primary:hover:not(:disabled), .cta-primary:focus-visible:not(:disabled) {
+            background-color: var(--accent-blue-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(58, 134, 255, 0.4);
+            text-decoration: none;
+        }
+
+        .cta-secondary {
+            background-color: transparent;
+            color: var(--text-light);
+            border: 2px solid var(--border-color);
+        }
+        .cta-secondary:hover:not(:disabled), .cta-secondary:focus-visible:not(:disabled) {
+            background-color: var(--bg-medium);
+            border-color: var(--accent-blue);
+            text-decoration: none;
+            transform: translateY(-3px);
+        }
+
+        /* * ========================================
+         * SECTION: TOP NAVIGATION (SHARED)
+         * ========================================
+         */
+         .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background-color: var(--bg-dark);
+            border-bottom: 2px solid var(--border-color);
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
+         }
+         .top-nav .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+         }
+         .nav-brand {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text-light);
+         }
+         .nav-auth {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+         }
+         #user-display-name {
+            color: var(--text-medium);
+            font-size: 0.9rem;
+            display: none; /* Hidden by default */
+         }
+         .nav-btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+         }
+
+        /* * ========================================
+         * SECTION: HERO (SALES PAGE)
+         * ========================================
+         */
+        .hero {
+            padding: 6rem 0 6rem;
+            text-align: center;
+            background:
+                radial-gradient(circle at 10% 20%, rgba(58, 134, 255, 0.15), transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(58, 134, 255, 0.1), transparent 40%);
+            min-height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .hero .container {
+            max-width: 800px;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            margin: 0 auto 2rem;
+        }
+        .hero-cta-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+        }
+        
+        /* * ========================================
+         * SECTION: VALUE STACK (SALES PAGE)
+         * ========================================
+         */
+        .value-stack-section {
+            background-color: var(--bg-medium);
+            padding: 4rem 0;
+            border-top: 2px solid var(--border-color);
+            border-bottom: 2px solid var(--border-color);
+        }
+        .value-stack-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        .value-box {
+            background: var(--bg-medium);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            flex: 1 1 220px;
+            max-width: 280px;
+            text-align: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .value-box:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-blue);
+        }
+        .value-box .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--accent-blue);
+        }
+        .value-box h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-light);
+        }
+        .value-box p {
+            font-size: 0.95rem;
+            color: var(--text-medium);
+        }
+        
+        /* * ========================================
+         * SECTION: PRICING (SALES PAGE)
+         * ========================================
+         */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            align-items: stretch;
+        }
+        @media (min-width: 768px) {
+            .pricing-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (min-width: 1024px) {
+            .pricing-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        .price-card {
+            background: var(--bg-medium);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .price-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-blue);
+        }
+        .price-card-header {
+            text-align: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .price-card-header h3 {
+            font-size: 1.3rem;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+        }
+        .price-card .price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+        .price-card .ratings {
+            font-size: 0.9rem;
+            color: var(--highlight-yellow);
+            margin-top: 0.5rem;
+        }
+        .price-card-features {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 2rem;
+            flex-grow: 1;
+        }
+        .price-card-features li {
+            position: relative;
+            padding-left: 1.75rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-medium);
+        }
+        .price-card-features li::before {
+            content: '✔';
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: var(--success-green);
+            font-weight: 700;
+        }
+        .price-card .cta-button {
+            width: 100%;
+        }
+        .price-card.recommended {
+            border-color: var(--accent-blue);
+            transform: scale(1.05);
+            position: relative;
+            z-index: 10;
+        }
+        .price-card.recommended:hover {
+            transform: scale(1.05) translateY(-10px);
+        }
+        .price-card.recommended::before {
+            content: 'RECOMMENDED';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%) translateY(-50%);
+            background: var(--accent-blue);
+            color: #fff;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* * ========================================
+         * SECTION: SOCIAL PROOF (SALES PAGE)
+         * ========================================
+         */
+        .social-proof {
+            background-color: var(--bg-medium);
+            padding: 4rem 0;
+        }
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        .testimonial-card {
+            background: var(--bg-dark);
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            border-left: 5px solid var(--accent-blue);
+            box-shadow: var(--shadow-sm);
+        }
+        .testimonial-card blockquote {
+            font-size: 1.1rem;
+            font-style: italic;
+            border: none;
+            padding: 0;
+            margin: 0 0 1rem;
+            color: var(--text-light);
+        }
+        .testimonial-card footer {
+            font-weight: 700;
+            color: var(--text-medium);
+        }
+        .testimonial-card footer span {
+            display: block;
+            font-weight: 400;
+            font-size: 0.9rem;
+            color: var(--accent-blue);
+        }
+
+        /* * ========================================
+         * SECTION: FAQ & GUARANTEE (SALES PAGE)
+         * ========================================
+         */
+        .faq-guarantee-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 4rem;
+            padding: 4rem 0;
+        }
+        @media (min-width: 992px) {
+            .faq-guarantee-grid {
+                grid-template-columns: 2fr 1fr;
+            }
+        }
+        .faq-container details {
+            background: var(--bg-medium);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            margin-bottom: 1rem;
+        }
+        .faq-container summary {
+            padding: 1rem 1.5rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            list-style: none;
+            position: relative;
+        }
+        .faq-container summary::-webkit-details-marker {
+            display: none;
+        }
+        .faq-container summary::after {
+            content: '+';
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            color: var(--accent-blue);
+            transition: transform 0.2s ease;
+        }
+        .faq-container details[open] summary::after {
+            transform: translateY(-50%) rotate(45deg);
+        }
+        .faq-container .faq-answer {
+            padding: 0 1.5rem 1.5rem;
+            border-top: 2px solid var(--border-color);
+        }
+        .guarantee-box {
+            background: var(--guarantee-bg);
+            border: 2px solid var(--accent-blue);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(58, 134, 255, 0.2);
+        }
+        .guarantee-box .icon {
+            font-size: 3rem;
+            color: var(--highlight-yellow);
+        }
+        .guarantee-box h3 {
+            color: var(--highlight-yellow);
+        }
+
+        /* * ========================================
+         * SECTION: FOOTER (SALES PAGE)
+         * ========================================
+         */
+        .footer {
+            background-color: var(--bg-medium);
+            padding: 3rem 0;
+            text-align: center;
+            color: var(--text-medium);
+            font-size: 0.9rem;
+            border-top: 2px solid var(--border-color);
+        }
+        .footer p {
+            margin: 0;
+            margin-bottom: 0.5rem;
+        }
+        .footer a {
+            color: var(--text-medium);
+            font-weight: 700;
+        }
+        .footer a:hover {
+            color: var(--accent-blue);
+        }
+
+        /* * ========================================
+         * MODAL: AUTH (SHARED)
+         * ========================================
+         */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: var(--bg-light);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-medium);
+            font-size: 2rem;
+            line-height: 1;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .modal-close:hover {
+            color: var(--text-light);
+            transform: rotate(90deg);
+        }
+        .modal-content h3 {
+            margin-bottom: 0.5rem;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .form-group input[type="email"],
+        .form-group input[type="password"] {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg-dark);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-light);
+            font-family: var(--font-system);
+            font-size: 1rem;
+            transition: border-color 0.2s ease;
+        }
+        .form-group input:focus {
+            border-color: var(--accent-blue);
+            outline: none;
+        }
+        #auth-forms .cta-button {
+            width: 100%;
+        }
+        #auth-status {
+            color: var(--text-medium);
+            font-size: 0.95rem;
+            margin-top: 1rem;
+            min-height: 1.2em;
+        }
+        
+        /* * ========================================
+         * (MERGED) COURSE PAGE STYLES
+         * ========================================
+         */
+        .course-header {
+            padding: 4rem 0 2rem;
+            text-align: center;
+            background:
+                radial-gradient(circle at 10% 20%, rgba(58, 134, 255, 0.15), transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(58, 134, 255, 0.1), transparent 40%);
+        }
+        .course-content {
+            padding: 2rem 0 4rem;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 3rem;
+        }
+        @media (min-width: 992px) {
+            .course-content {
+                 grid-template-columns: 3fr 1fr;
+            }
+        }
+        .video-player-main {
+            background: var(--bg-medium);
+            border-radius: var(--radius-lg);
+            border: 2px solid var(--border-color);
+            overflow: hidden;
+        }
+        .video-embed-placeholder {
+            background-color: #000;
+            aspect-ratio: 16 / 9;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: var(--text-medium);
+        }
+        .video-embed-placeholder .icon {
+            font-size: 4rem;
+        }
+        .video-embed-placeholder p {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+        .video-player-main .video-title {
+            padding: 1.5rem 2rem;
+        }
+        .video-player-main .video-title h2 {
+            border: none;
+            margin-bottom: 0.5rem;
+        }
+        .video-playlist {
+            background: var(--bg-medium);
+            border-radius: var(--radius-lg);
+            border: 2px solid var(--border-color);
+            padding: 1.5rem;
+            height: fit-content;
+        }
+        .video-playlist h3 {
+            margin-bottom: 1.5rem;
+            font-size: 1.25rem;
+            color: var(--accent-blue);
+        }
+        .playlist-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            border: 2px solid transparent;
+        }
+        .playlist-item:hover {
+            background: var(--bg-light);
+        }
+        .playlist-item.active {
+            background: var(--bg-dark);
+            border-color: var(--accent-blue);
+        }
+        .playlist-item .icon {
+            font-size: 1.5rem;
+            color: var(--text-medium);
+        }
+        .playlist-item.active .icon {
+            color: var(--accent-blue);
+        }
+        .playlist-item .item-title {
+            font-weight: 500;
+            color: var(--text-light);
+            margin: 0;
+        }
+        .playlist-item .item-duration {
+            font-size: 0.9rem;
+            color: var(--text-medium);
+            margin: 0;
+        }
+
+        /* * ========================================
+         * (MERGED) STATUS / MESSAGES
+         * ========================================
+         */
+        .status-container {
+            min-height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 3rem 0;
+        }
+        .status-box {
+            background: var(--bg-medium);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 3rem 2.5rem;
+            max-width: 500px;
+        }
+        .status-box .icon {
+            font-size: 4rem;
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+        .status-box .icon.loading {
+            color: var(--accent-blue);
+            animation: spin 1.5s linear infinite;
+        }
+        .status-box .icon.error {
+            color: var(--error-red);
+        }
+        .status-box h2 {
+            border: none;
+            padding: 0;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+    </style>
+
+    <!-- Firebase (compat) SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    
+</head>
+<body>
+
+    <!-- SHARED NAVIGATION -->
+    <nav class="top-nav">
+        <div class="container">
+            <div class="nav-brand">Editor</div>
+            <div class="nav-auth">
+                <span id="user-display-name"></span>
+                <button id="login-btn" class="cta-button cta-secondary nav-btn">Sign In</button>
+                <button id="logout-btn" class="cta-button cta-secondary nav-btn" style="display: none;">Sign Out</button>
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- CONTENT WRAPPER 1: SALES PAGE (Visible by default) -->
+    <div id="sales-page-content">
+        <header class="hero">
+            <div class="container">
+                <h1>Master Pro Video Editing. Guaranteed.</h1>
+                <p>
+                    The A-to-Z system to create stunning videos that capture attention,
+                    even if you've never used editing software before.
+                </p>
+                <div class="hero-cta-group">
+                    <a href="#plans" class="cta-button cta-primary enroll-btn" data-plan="Creator Fast-Track" data-price="12">
+                        Join Now — Only $5
+                    </a>
+                    <a href="#plans" class="cta-button cta-secondary">
+                        Explore Plans
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <section class="value-stack-section">
+                <div class="container">
+                    <div class="section-header">
+                        <h2>What You'll Be Able to Do</h2>
+                        <p>This course is 100% outcome-focused. By completing it, you'll be able to:</p>
+                    </div>
+                    <div class="value-stack-grid">
+                        <div class="value-box">
+                            <div class="icon">🎬</div>
+                            <h3>Edit Viral-Style Videos</h3>
+                            <p>Master the cuts, captions, sound design, and pacing that make videos go viral.</p>
+                        </div>
+                        <div class="value-box">
+                            <div class="icon">🎨</div>
+                            <h3>Community</h3>
+                            <p>Access to discord servers. ask questions, learn together</p>
+                        </div>
+                        <div class="value-box">
+                            <div class="icon">📈</div>
+                            <h3>Land Your First Client</h3>
+                            <p>Package your skills, find clients, and start getting paid to edit even as a beginner.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="pricing" id="plans">
+                <div class="container">
+                    <div class="section-header">
+                        <h2>Choose Your Plan</h2>
+                        <p>Start learning immediately. All plans include lifetime access.</p>
+                    </div>
+                    <div class="pricing-grid">
+                        <!-- Plan 1 -->
+                        <div class="price-card">
+                            <div class="price-card-header">
+                                <h3>Quick-Start Kit</h3>
+                                <div class="price">$5</div>
+                                <div class="ratings">★★★★★ <span>(placeholder)</span></div>
+                            </div>
+                            <ul class="price-card-features">
+                                <li>Core Editing Fundamentals</li>
+                                <li>Project Files</li>
+                                <li>Discord Community</li>
+                                <li>Portfolio Setup</li>
+                                <li><S>(Pro Features)</S></li>
+                            </ul>
+                            <button class="cta-button cta-secondary enroll-btn" data-plan="Quick-Start Kit" data-price="5">
+                                Enroll Now
+                            </button>
+                        </div>
+                        <!-- Plan 2 -->
+                        <div class="price-card">
+                            <div class="price-card-header">
+                                <h3>Gaming Specific</h3>
+                                <div class="price">$12</div>
+                                <div class="ratings">★★★★★ <span>(placeholder)</span></div>
+                            </div>
+                            <ul class="price-card-features">
+                                <li><strong>Gaming Editing Basics</strong></li>
+                                <li><strong>Discord Community</strong></li>
+                                <li><strong>Taught by YesLucid</strong></li>
+                                <li>After Effects Tutorials</li>
+                                <li>Complex Tactics</li>
+                            </ul>
+                            <button class="cta-button cta-secondary enroll-btn" data-plan="Creator Fast-Track" data-price="12">
+                                Enroll Now
+                            </button>
+                        </div>
+                        <!-- Plan 3 (Recommended) -->
+                        <div class="price-card recommended">
+                            <div class="price-card-header">
+                                <h3>Advanced</h3>
+                                <div class="price">$25</div>
+                                <div class="ratings">★★★★★ <span>(placeholder)</span></div>
+                            </div>
+                            <ul class="price-card-features">
+                                <li>Everything in Fast-Track</li>
+                                <li>(Placeholder)</li>
+                                <li>(Placeholder)</li>
+                                <li>(Placeholder)</li>
+                            </ul>
+                            <button class="cta-button cta-primary enroll-btn" data-plan="Pro Accelerator" data-price="25">
+                                Enroll Now
+                            </button>
+                        </div>
+                        <!-- Plan 4 -->
+                        <div class="price-card">
+                            <div class="price-card-header">
+                                <h3>Pro Guide</h3>
+                                <div class="price">$100</div>
+                                <div class="ratings">★★★★★ <span>(placeholder)</span></div>
+                            </div>
+                            <ul class="price-card-features">
+                                <li>Everything in Pro</li>
+                                <li>(Placeholder)</li>
+                                <li>(Placeholder)</li>
+                            </ul>
+                            <button class="cta-button cta-secondary enroll-btn" data-plan="1-on-1 Mentorship" data-price="100">
+                                Enroll Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="social-proof">
+                <div class="container">
+                    <div class="section-header">
+                        <h2>Join Other Successful Students</h2>
+                        <p>Don't just take our word for it.</p>
+                    </div>
+                    <div class="testimonials-grid">
+                        <div class="testimonial-card">
+                            <blockquote>"(Placeholder)"</blockquote>
+                            <footer>Sarah K.<span>Freelance Video Editor</span></footer>
+                        </div>
+                        <div class="testimonial-card">
+                            <blockquote>"(Placeholder)"</blockquote>
+                            <footer>Mike J.<span>Content Creator</span></footer>
+                        </div>
+                        <div class="testimonial-card">
+                            <blockquote>"(Placeholder)"</blockquote>
+                            <footer>David L.<span>Small Business Owner</span></footer>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="faq-guarantee">
+                <div class="container faq-guarantee-grid">
+                    <div class="faq-container">
+                        <h2>Frequently Asked Questions</h2>
+                        <details>
+                            <summary>What software do I need?</summary>
+                            <div class="faq-answer">
+                                <p>The course is taught using Adobe Premiere Pro but the principles apply to any software like DaVinci Resolve, Final Cut Pro, or CapCut.</p>
+                            </div>
+                        </details>
+                        <details>
+                            <summary>I'm a complete beginner. Is this for me?</summary>
+                            <div class="faq-answer">
+                                <p>Yes! This course is designed as a "zero-to-pro" system. We start with the absolute basics and guide you step-by-step.</p>
+                            </div>
+                        </details>
+                        <details>
+                            <summary>How long do I have access?</summary>
+                            <div class="faq-answer">
+                                <p>You get lifetime access to all course materials, including all future updates, for a single one-time payment.</p>
+                            </div>
+                        </Deta >
+                    </div>
+                    <div class="guarantee-box">
+                        <div class="icon">🛡️</div>
+                        <h3>7-Day Risk-Free Guarantee</h3>
+                        <p>(Placeholder)</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2025 DevsCofee.com. All rights reserved.</p>
+                <p>
+                    <a href="mailto:devscoffeecontact@gmail.com">Contact Support</a> |
+                    <a href="#">Privacy Policy</a> |
+                    <a href="#">Terms of Service</a>
+                </p>
+            </div>
+        </footer>
+    </div>
+    <!-- END SALES PAGE CONTENT -->
+
+
+    <!-- CONTENT WRAPPER 2: COURSE PAGE (Hidden by default) -->
+    <div id="course-page-content" style="display: none;">
+        <main>
+            <!-- This container holds all possible states: Loading, Error, or Success -->
+            <div id="page-container">
+                <!-- 1. LOADING STATE (Default) -->
+                <div class="status-container" id="loading-state">
+                    <div class="status-box">
+                        <div class="icon loading">⏳</div>
+                        <h2>Checking Access...</h2>
+                        <p>Please wait while we verify your purchase.</p>
+                    </div>
+                </div>
+                
+                <!-- 2. COURSE CONTENT (Hidden by default) -->
+                <div id="course-unlocked" style="display: none;">
+                    <header class="course-header">
+                        <div class="container">
+                            <h1>Welcome to the Course!</h1>
+                            <p>You're in. Select a video from the playlist to get started.</p>
+                        </div>
+                    </header>
+                    <section class="container course-content">
+                        <!-- Main Video Player -->
+                        <div class="video-player-main">
+                            <div class="video-embed-placeholder" id="video-embed">
+                                <div class="icon">🎬</div>
+                                <p>Select a video to begin</p>
+                            </div>
+                            <div class="video-title">
+                                <h2 id="video-title-display">Welcome!</h2>
+                                <p id="video-description-display">Select a video from the playlist on the right to start learning.</p>
+                            </div>
+                        </div>
+                        <!-- Video Playlist -->
+                        <aside class="video-playlist">
+                            <h3>Course Modules</h3>
+                            <div id="playlist-container">
+                                <!-- Playlist items will be injected here by JavaScript -->
+                            </div>
+                        </aside>
+                    </section>
+                </div>
+            </div> <!-- End #page-container -->
+        </main>
+    </div>
+    <!-- END COURSE PAGE CONTENT -->
+
+    
+    <!-- AUTH MODAL (SHARED) -->
+    <div id="auth-modal" class="modal" aria-hidden="true">
+        <div class="modal-content" role="dialog" aria-modal="true" aria-label="Login">
+            <button class="modal-close" id="auth-close" aria-label="Close auth modal">&times;</button>
+            <h3 id="auth-title">Sign in to continue</h3>
+            <div id="auth-forms">
+                <form id="email-signin-form" style="margin-bottom:1rem;" onsubmit="return false;">
+                    <div class="form-group">
+                        <label for="email-input">Email</label>
+                        <input id="email-input" type="email" required placeholder="you@example.com" />
+                    </div>
+                    <div class="form-group">
+                        <label for="password-input">Password</label>
+                        <input id="password-input" type="password" required placeholder="password" />
+                    </div>
+                    <div style="display:flex;gap:0.5rem;margin-top:0.75rem;">
+                        <button id="email-signin-btn" class="cta-button cta-primary" type="button">Sign in</button>
+                        <button id="email-signup-btn" class="cta-button cta-secondary" type="button">Sign up</button>
+                    </div>
+                </form>
+                <div style="margin-bottom:1rem;">
+                    <button id="google-signin-btn" class="cta-button cta-secondary">Continue with Google</button>
+                </div>
+                <div id="auth-status"></div>
+            </div>
+        </div>
+    </div>
+    <!-- END AUTH MODAL -->
+
+
+    <script>
+    /* ========== CONSOLIDATED PAGE SCRIPT ========== */
+    
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // --- 1. Modal Helper Functions ---
+        const showModal = (modalEl) => {
+            if(modalEl) {
+                modalEl.classList.add('active');
+                modalEl.setAttribute('aria-hidden', 'false');
+            }
+        };
+        const hideModal = (modalEl) => {
+            if(modalEl) {
+                modalEl.classList.remove('active');
+                modalEl.setAttribute('aria-hidden', 'true');
+            }
+        };
+
+        /* ========== 2. FIREBASE & PAYMENT CONFIG ========== */
+
+        // <<< STEP 1: FILL IN YOUR FIREBASE CONFIG >>>
+        // Get this from your Firebase Project Settings
+        const firebaseConfig = {
+          apiKey: "AIzaSyB4qMlzlV0FHsgwGyKBYOJETvjD_i5Nmis",
+          authDomain: "editing-1750c.firebaseapp.com",
+          projectId: "editing-1750c",
+          storageBucket: "editing-1750c.firebasestorage.app",
+          messagingSenderId: "316187910712",
+          appId: "1:316187910712:web:e0be47dbd6e5af30d2fccd",
+          measurementId: "G-78BQD5FHYF"
+        };
+        
+        // <<< STEP 2: FILL IN YOUR STRIPE PAYMENT LINKS >>>
+        // Create these in your Stripe Dashboard
+        // The key (e.g., '5') MUST match the data-price on your buttons
+        const PAYMENT_LINK_MAP = {
+          '5': 'https://buy.stripe.com/test_7sI8ye7hI6vIfJeeUU',
+          '12': 'https://buy.stripe.com/YOUR_LINK_FOR_12_DOLLAR_PLAN',
+          '25': 'https://buy.stripe.com/YOUR_LINK_FOR_25_DOLLAR_PLAN',
+          '100': 'https://buy.stripe.com/YOUR_LINK_FOR_100_DOLLAR_PLAN'
+        };
+        
+        // This will store the base links before we add user info
+        const BASE_PAYMENT_LINKS = { ...PAYMENT_LINK_MAP };
+
+        
+        /* ========== 3. (MERGED) COURSE VIDEO DATA & FUNCTIONS ========== */
+        
+        // <<< STEP 3: FILL IN YOUR VIDEO CONTENT >>>
+        // 'embedUrl' has been changed to 'videoUrl'
+        // This MUST be a direct link to a video file (e.g., .mp4)
+        const courseVideos = [
+            {
+                title: "Part 1: The Setup",
+                duration: "8:42",
+                description: "Learn how to set up your project files and workspace for maximum efficiency.",
+                embedUrl: "https://www.youtube.com/embed/sgNPozHPv04" // <<< CHANGED from videoUrl
+            },
+            {
+                title: "Part 2: Basic Editing",
+                duration: "14:10",
+                description: "Master the timeline, cutting, and basic transitions.",
+                embedUrl: "" // <<< CHANGED from videoUrl (fill this in)
+            },
+            {
+                title: "Part 3: Audio Magic",
+                duration: "12:05",
+                description: "Make your videos sound professional with audio mixing and sound effects.",
+                embedUrl: "" // <<< CHANGED from videoUrl (fill this in)
+            },
+            {
+                title: "Part 4: Color Grading",
+                duration: "10:30",
+                description: "Learn the basics of color correction and cinematic color grading.",
+                embedUrl: "" // <<< CHANGED from videoUrl (fill this in)
+            },
+            {
+                title: "Part 5: Exporting",
+                duration: "5:15",
+                description: "Export your final video for YouTube, TikTok, and Instagram.",
+                embedUrl: "" // <<< CHANGED from videoUrl (fill this in)
+            }
+        ];
+
+        /**
+         * Loads the clicked video into the main player.
+         */
+        function playVideo(video, clickedElement) {
+            const videoEmbed = document.getElementById('video-embed');
+            const videoTitleDisplay = document.getElementById('video-title-display');
+            const videoDescriptionDisplay = document.getElementById('video-description-display');
+            
+            if (!videoEmbed || !videoTitleDisplay || !videoDescriptionDisplay) return;
+
+            // This is the new part that uses a <video> tag
+            if (video.embedUrl) { // <<< CHANGED from videoUrl
+                videoEmbed.innerHTML = `
+                    <iframe 
+                        style="width: 100%; height: 100%; border: none; aspect-ratio: 16/9;"
+                        src="${video.embedUrl}" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
+                `;
+            } else {
+                // This is the fallback if the URL is empty
+                videoEmbed.innerHTML = `
+                    <div class="icon">🚫</div>
+                    <p>Video not available</p>
+                `;
+            }
+            
+            videoTitleDisplay.textContent = video.title;
+            videoDescriptionDisplay.textContent = video.description;
+            
+            document.querySelectorAll('.playlist-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            if (clickedElement) {
+                clickedElement.classList.add('active');
+            }
+        }
+
+        /**
+         * Populates the playlist sidebar with videos.
+         */
+        function buildPlaylist() {
+            const playlistContainer = document.getElementById('playlist-container');
+            if (!playlistContainer) return;
+            
+            playlistContainer.innerHTML = ''; // Clear it
+            
+            courseVideos.forEach((video, index) => {
+                const item = document.createElement('div');
+                item.className = 'playlist-item';
+                item.innerHTML = `
+                    <div class="icon">▶️</div>
+                    <div>
+                        <p class="item-title">${video.title}</p>
+                        <p class="item-duration">${video.duration}</p>
+                    </div>
+                `;
+                
+                item.addEventListener('click', () => {
+                    playVideo(video, item);
+                });
+                
+                playlistContainer.appendChild(item);
+                
+                // Auto-play the first video
+                if (index === 0) {
+                    playVideo(video, item);
+                }
+            });
+        }
+
+        /**
+         * Shows the correct section *within the course page content area*.
+         */
+        function showCourseSection(section) {
+            const loadingState = document.getElementById('loading-state');
+            const courseUnlocked = document.getElementById('course-unlocked');
+
+            if (loadingState) loadingState.style.display = 'none';
+            if (courseUnlocked) courseUnlocked.style.display = 'none';
+            
+            if (section === 'loading' && loadingState) loadingState.style.display = 'flex';
+            if (section === 'unlocked' && courseUnlocked) courseUnlocked.style.display = 'block';
+        }
+
+
+        /* ========== 4. FIREBASE & AUTH LOGIC ========== */
+
+        // Initialize Firebase
+        let auth;
+        let db;
+        try {
+            // Check if Firebase config has been filled
+            if (FIREBASE_CONFIG.apiKey === "YOUR_API_KEY_HERE") {
+                console.warn("Firebase config is not filled. Please fill in the placeholders.");
+            } else {
+                firebase.initializeApp(FIREBASE_CONFIG);
+                auth = firebase.auth();
+                db = firebase.firestore();
+            }
+        } catch (e) {
+            console.error("Firebase initialization error", e);
+        }
+
+        // --- All UI Elements ---
+        const salesPageContent = document.getElementById('sales-page-content');
+        const coursePageContent = document.getElementById('course-page-content');
+
+        const loginBtn = document.getElementById('login-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const userDisplayName = document.getElementById('user-display-name');
+        
+        const authModal = document.getElementById('auth-modal');
+        const authClose = document.getElementById('auth-close');
+        const emailSigninBtn = document.getElementById('email-signin-btn');
+        const emailSignupBtn = document.getElementById('email-signup-btn');
+        const googleSigninBtn = document.getElementById('google-signin-btn');
+        const emailInput = document.getElementById('email-input');
+        const passwordInput = document.getElementById('password-input');
+        const authStatus = document.getElementById('auth-status');
+        
+        const allEnrollButtons = document.querySelectorAll('.enroll-btn');
+
+        /**
+         * Checks Firestore to see if the user has purchased the course.
+         */
+        async function checkUserAccess(userId) {
+            if (!db) {
+                console.error("Firestore (db) is not initialized.");
+                salesPageContent.style.display = 'block';
+                coursePageContent.style.display = 'none';
+                return () => {}; // Return an empty function
+            }
+            
+            try {
+                const purchaseDocRef = db.doc(`users/${userId}/purchases/main-course`);
+                
+                // Use onSnapshot for real-time updates!
+                const unsubscribe = purchaseDocRef.onSnapshot(docSnap => {
+                    if (docSnap.exists() && docSnap.data().unlocked === true) {
+                        console.log("Access Granted!");
+                        salesPageContent.style.display = 'none';
+                        coursePageContent.style.display = 'block';
+                        showCourseSection('unlocked');
+                        buildPlaylist();
+                    } else {
+                        console.log("Access Denied. No purchase record found.");
+                        salesPageContent.style.display = 'block';
+                        coursePageContent.style.display = 'none';
+                    }
+                }, err => {
+                     console.error("Error listening to purchase doc:", err);
+                     salesPageContent.style.display = 'block';
+                     coursePageContent.style.display = 'none';
+                });
+                
+                return unsubscribe; // Return the function to stop the listener
+
+            } catch (err) {
+                console.error("Error checking Firestore:", err);
+                salesPageContent.style.display = 'block';
+                coursePageContent.style.display = 'none';
+                return () => {}; // Return an empty function
+            }
+        }
+
+        let firestoreListener = null; // Variable to hold our listener
+
+        if (auth) {
+            // --- Auth Modal Listeners ---
+            if (loginBtn) loginBtn.addEventListener('click', (e) => { e.preventDefault(); showModal(authModal); });
+            if (authClose) authClose.addEventListener('click', () => hideModal(authModal));
+            if (authModal) authModal.addEventListener('click', (e) => { if (e.target === authModal) hideModal(authModal); });
+
+            // --- Auth Action Handlers ---
+            if (emailSigninBtn) emailSigninBtn.addEventListener('click', async () => {
+                const email = (emailInput && emailInput.value) || '';
+                const pass = (passwordInput && passwordInput.value) || '';
+                if (!email || !pass) { authStatus.textContent = 'Please enter email and password.'; return; }
+                authStatus.textContent = 'Signing in...';
+                try {
+                    await auth.signInWithEmailAndPassword(email, pass);
+                    authStatus.textContent = 'Signed in!';
+                    setTimeout(() => {
+                         hideModal(authModal);
+                         authStatus.textContent = '';
+                         if(emailInput) emailInput.value = '';
+                         if(passwordInput) passwordInput.value = '';
+                    }, 500);
+                } catch (err) {
+                    authStatus.textContent = 'Error: ' + err.message;
+                }
+            });
+
+            if (emailSignupBtn) emailSignupBtn.addEventListener('click', async () => {
+                const email = (emailInput && emailInput.value) || '';
+                const pass = (passwordInput && passwordInput.value) || '';
+                if (!email || !pass) { authStatus.textContent = 'Please enter email and password.'; return; }
+                authStatus.textContent = 'Creating account...';
+                try {
+                    await auth.createUserWithEmailAndPassword(email, pass);
+                    authStatus.textContent = 'Account created! Signed in.';
+                    setTimeout(() => {
+                         hideModal(authModal);
+                         authStatus.textContent = '';
+                         if(emailInput) emailInput.value = '';
+                         if(passwordInput) passwordInput.value = '';
+                    }, 500);
+                } catch (err) {
+                    authStatus.textContent = 'Error: ' + err.message;
+                }
+            });
+
+            if (googleSigninBtn) googleSigninBtn.addEventListener('click', async () => {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                authStatus.textContent = 'Opening Google Sign-in...';
+                try {
+                    await auth.signInWithPopup(provider);
+                    authStatus.textContent = 'Signed in with Google!';
+                    setTimeout(() => {
+                        hideModal(authModal);
+                        authStatus.textContent = '';
+                    }, 500);
+                } catch (err) {
+                    authStatus.textContent = 'Google sign-in error: ' + err.message;
+                }
+            });
+
+            if (logoutBtn) logoutBtn.addEventListener('click', async () => {
+                if (firestoreListener) {
+                    firestoreListener(); // Detach the listener
+                    firestoreListener = null;
+                }
+                await auth.signOut();
+            });
+
+            // --- MASTER AUTH STATE LISTENER ---
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    // --- USER IS SIGNED IN ---
+                    const name = user.displayName || user.email.split('@')[0];
+                    if (userDisplayName) userDisplayName.textContent = `Welcome, ${name}`;
+                    if (userDisplayName) userDisplayName.style.display = 'inline';
+                    if (loginBtn) loginBtn.style.display = 'none';
+                    if (logoutBtn) logoutBtn.style.display = 'inline-block';
+
+                    const userId = user.uid;
+                    for (const key in BASE_PAYMENT_LINKS) {
+                        const baseUrl = BASE_PAYMENT_LINKS[key];
+                        PAYMENT_LINK_MAP[key] = `${baseUrl}?client_reference_id=${userId}`;
+                    }
+                    allEnrollButtons.forEach(btn => btn.disabled = false);
+
+                    salesPageContent.style.display = 'none';
+                    coursePageContent.style.display = 'block';
+                    showCourseSection('loading');
+                    
+                    if (firestoreListener) firestoreListener();
+                    firestoreListener = await checkUserAccess(user.uid);
+                    
+                } else {
+                    // --- USER IS SIGNED OUT ---
+                    if (userDisplayName) userDisplayName.style.display = 'none';
+                    if (loginBtn) loginBtn.style.display = 'inline-block';
+                    if (logoutBtn) logoutBtn.style.display = 'none';
+
+                    for (const key in BASE_PAYMENT_LINKS) {
+                        PAYMENT_LINK_MAP[key] = BASE_PAYMENT_LINKS[key];
+                    }
+                    allEnrollButtons.forEach(btn => btn.disabled = true);
+
+                    if (firestoreListener) {
+                        firestoreListener();
+                        firestoreListener = null;
+                    }
+                    
+                    salesPageContent.style.display = 'block';
+                    coursePageContent.style.display = 'none';
+                }
+            });
+
+            // --- MASTER ENROLL BUTTON CLICK LISTENER ---
+            allEnrollButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const price = btn.dataset.price;
+                    
+                    if (auth.currentUser) {
+                        const paymentLink = PAYMENT_LINK_MAP[price];
+                        if (paymentLink && (paymentLink.includes('https://') || paymentLink.includes('http://'))) {
+                            if(paymentLink.includes('YOUR_LINK')) {
+                                console.error(`Placeholder link for price '${price}'. Please update 'PAYMENT_LINK_MAP' in your code.`);
+                            } else {
+                                window.open(paymentLink, '_blank');
+                            }
+                        } else {
+                            console.error(`Configuration error: No valid Payment Link for price '${price}'.`);
+                        }
+                    } else {
+                        showModal(authModal);
+                    }
+                });
+            });
+
+        } // end if(auth)
+
+        // --- 5. Accessibility: Close Modals with Escape ---
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (authModal && authModal.classList.contains('active')) {
+                    hideModal(authModal);
+                }
+            }
+        });
+
+    }); // End DOMContentLoaded
+    </script>
+    
+</body>
+</html>
