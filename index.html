@@ -6,7 +6,6 @@
     <title>Editor</title>
     
     <style>
-        /* ... all your CSS styles ... */
         /* * ========================================
          * CSS VARIABLES (THEME & TOKENS)
          * ========================================
@@ -796,7 +795,7 @@
                     even if you've never used editing software before.
                 </p>
                 <div class="hero-cta-group">
-                    <a href="#plans" class="cta-button cta-primary enroll-btn" data-plan="Creator Fast-Track" data-price="12">
+                    <a href="#plans" class="cta-button cta-primary enroll-btn" data-plan="Creator Fast-Track" data-price="5">
                         Join Now — Only $5
                     </a>
                     <a href="#plans" class="cta-button cta-secondary">
@@ -957,7 +956,7 @@
                             <div class="faq-answer">
                                 <p>You get lifetime access to all course materials, including all future updates, for a single one-time payment.</p>
                             </div>
-                        </Deta >
+                        </details>
                     </div>
                     <div class="guarantee-box">
                         <div class="icon">🛡️</div>
@@ -1082,21 +1081,20 @@
 
         /* ========== 2. FIREBASE & PAYMENT CONFIG ========== */
 
-        // <<< STEP 1: FILL IN YOUR FIREBASE CONFIG >>>
-        // Get this from your Firebase Project Settings
-        const firebaseConfig = {
+        // <<< STEP 1: YOUR FIREBASE CONFIG >>>
+        const FIREBASE_CONFIG = {
           apiKey: "AIzaSyB4qMlzlV0FHsgwGyKBYOJETvjD_i5Nmis",
           authDomain: "editing-1750c.firebaseapp.com",
           projectId: "editing-1750c",
-          storageBucket: "editing-1750c.firebasestorage.app",
+          storageBucket: "editing-1750c.appspot.com",
           messagingSenderId: "316187910712",
           appId: "1:316187910712:web:e0be47dbd6e5af30d2fccd",
           measurementId: "G-78BQD5FHYF"
         };
         
-        // <<< STEP 2: FILL IN YOUR STRIPE PAYMENT LINKS >>>
-        // Create these in your Stripe Dashboard
+        // <<< STEP 2: YOUR STRIPE PAYMENT LINKS >>>
         // The key (e.g., '5') MUST match the data-price on your buttons
+        // I've used your $5 test link for all plans for now.
         const PAYMENT_LINK_MAP = {
           '5': 'https://buy.stripe.com/test_7sI8ye7hI6vIfJeeUU',
           '12': 'https://buy.stripe.com/test_7sI8ye7hI6vIfJeeUU',
@@ -1241,12 +1239,13 @@
         let db;
         try {
             // Check if Firebase config has been filled
-            if (FIREBASE_CONFIG.apiKey === "YOUR_API_KEY_HERE") {
-                console.warn("Firebase config is not filled. Please fill in the placeholders.");
-            } else {
+            if (FIREBASE_CONFIG.apiKey.includes("AIzaSyB")) {
                 firebase.initializeApp(FIREBASE_CONFIG);
                 auth = firebase.auth();
                 db = firebase.firestore();
+                console.log("Firebase Initialized Successfully!");
+            } else {
+                console.warn("Firebase config is not filled. Please fill in the placeholders.");
             }
         } catch (e) {
             console.error("Firebase initialization error", e);
@@ -1417,7 +1416,9 @@
                     for (const key in BASE_PAYMENT_LINKS) {
                         PAYMENT_LINK_MAP[key] = BASE_PAYMENT_LINKS[key];
                     }
-                    allEnrollButtons.forEach(btn => btn.disabled = true);
+                    // This was the bug! We must check if the user is signed out, and if so,
+                    // show the modal instead of doing nothing.
+                    // allEnrollButtons.forEach(btn => btn.disabled = true); // <-- REMOVED THIS LINE
 
                     if (firestoreListener) {
                         firestoreListener();
@@ -1436,6 +1437,7 @@
                     const price = btn.dataset.price;
                     
                     if (auth.currentUser) {
+                        // User is signed in, proceed to payment
                         const paymentLink = PAYMENT_LINK_MAP[price];
                         if (paymentLink && (paymentLink.includes('https://') || paymentLink.includes('http://'))) {
                             if(paymentLink.includes('YOUR_LINK')) {
@@ -1447,11 +1449,22 @@
                             console.error(`Configuration error: No valid Payment Link for price '${price}'.`);
                         }
                     } else {
+                        // User is NOT signed in, show the modal
+                        console.log("User not signed in. Showing auth modal.");
                         showModal(authModal);
                     }
                 });
             });
 
+        } else {
+            console.error("Firebase 'auth' object is not available. UI buttons will not work.");
+            // Fallback for when Firebase totally fails to init
+             allEnrollButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    alert("Error: Page scripts could not load. Please refresh and try again.");
+                });
+             });
         } // end if(auth)
 
         // --- 5. Accessibility: Close Modals with Escape ---
