@@ -1400,9 +1400,9 @@
                     }
                     allEnrollButtons.forEach(btn => btn.disabled = false);
 
-                    salesPageContent.style.display = 'none';
-                    coursePageContent.style.display = 'block';
-                    showCourseSection('loading');
+                    // salesPageContent.style.display = 'none';
+                    // coursePageContent.style.display = 'block';
+                    // showCourseSection('loading');
                     
                     if (firestoreListener) firestoreListener();
                     firestoreListener = await checkUserAccess(user.uid);
