@@ -1270,6 +1270,20 @@
         
         const allEnrollButtons = document.querySelectorAll('.enroll-btn');
 
+        // --- NEW: Check for Stripe Redirect ---
+        const urlParams = new URLSearchParams(window.location.search);
+        const paymentStatus = urlParams.get('payment');
+        
+        if (paymentStatus === 'success') {
+            // This is a redirect back from Stripe.
+            // Show the loading/verification screen immediately,
+            // The auth listener will take over from here.
+            if (salesPageContent) salesPageContent.style.display = 'none';
+            if (coursePageContent) coursePageContent.style.display = 'block';
+            showCourseSection('loading');
+        }
+        // --- END NEW BLOCK ---
+
         /**
          * Checks Firestore to see if the user has purchased the course.
          */
@@ -1294,8 +1308,16 @@
                         buildPlaylist();
                     } else {
                         console.log("Access Denied. No purchase record found.");
-                        salesPageContent.style.display = 'block';
-                        coursePageContent.style.display = 'none';
+                        
+                        // Check if we are in the middle of verifying a payment.
+                        const currentParams = new URLSearchParams(window.location.search);
+                        if (currentParams.get('payment') !== 'success') {
+                            // Only show sales page if we are NOT verifying.
+                            salesPageContent.style.display = 'block';
+                            coursePageContent.style.display = 'none';
+                        }
+                        // If we *are* verifying, we do nothing,
+                        // which leaves the loading spinner visible.
                     }
                 }, err => {
                      console.error("Error listening to purchase doc:", err);
