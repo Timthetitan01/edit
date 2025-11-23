@@ -1234,18 +1234,24 @@
                 
                 const unsubscribe = purchaseDocRef.onSnapshot(docSnap => {
                     if (docSnap.exists() && docSnap.data().unlocked === true) {
+                        // SUCCESS: Access granted
                         console.log("Access Granted!");
                         document.getElementById('sales-page-content').style.display = 'none';
                         document.getElementById('course-page-content').style.display = 'block';
                         showCourseSection('unlocked');
-                        
                         buildVideoModules();
                         
                     } else {
+                        // FAILURE: No purchase found
                         console.log("Access Denied. No purchase record found.");
                         
                         const currentParams = new URLSearchParams(window.location.search);
-                        if (currentParams.get('payment') !== 'success') {
+                        if (currentParams.get('payment') === 'success') {
+                            // User just paid. Stripe webhook is probably just slow.
+                            // DO NOTHING. This leaves the loading spinner visible, which is correct.
+                            console.log("Payment redirect detected. Waiting for webhook...");
+                        } else {
+                            // User is verified, logged in, but has not paid. Show sales page.
                             document.getElementById('sales-page-content').style.display = 'block';
                             document.getElementById('course-page-content').style.display = 'none';
                         }
@@ -1307,21 +1313,19 @@
                 try {
                     await auth.createUserWithEmailAndPassword(email, pass);
                     
-                    // --- NEW: Send verification email ---
                     if (auth.currentUser) {
                         await auth.currentUser.sendEmailVerification();
                         authStatus.textContent = 'Account created! Please check your email to verify.';
                     } else {
                         authStatus.textContent = 'Account created! Signed in.';
                     }
-                    // --- END NEW BLOCK ---
                     
                     setTimeout(() => {
                          hideModal(authModal);
                          authStatus.textContent = '';
                          if(emailInput) emailInput.value = '';
                          if(passwordInput) passwordInput.value = '';
-                    }, 1500); // Increased timeout to read the message
+                    }, 1500);
                 } catch (err) {
                     authStatus.textContent = 'Error: ' + err.message;
                 }
@@ -1344,7 +1348,7 @@
 
             if (logoutBtn) logoutBtn.addEventListener('click', async () => {
                 if (firestoreListener) {
-                    firestoreListener(); // Detach the listener
+                    firestoreListener();
                     firestoreListener = null;
                 }
                 await auth.signOut();
@@ -1390,15 +1394,11 @@
                         // --- 3. USER IS SIGNED IN AND VERIFIED ---
                         console.log("User signed in and VERIFIED. Checking for payment...");
                         
-                        // Show loading spinner while we check for payment
-                        // (Only if not coming from Stripe redirect, which already showed it)
-                        if (paymentStatus !== 'success') {
-                            if (coursePageContent) coursePageContent.style.display = 'block';
-                            showCourseSection('loading');
-                        }
+                        // SIMPLIFIED: ALWAYS show the course page container (which has the loading spinner)
+                        if (coursePageContent) coursePageContent.style.display = 'block';
+                        showCourseSection('loading');
                         
-                        // Now check for payment (this function already handles showing
-                        // the sales page or the course page)
+                        // Now check for payment
                         if (firestoreListener) firestoreListener();
                         firestoreListener = await checkUserAccess(user.uid);
                     }
@@ -1425,7 +1425,7 @@
                 }
             });
             
-            // --- NEW: Add listener for the "Resend Verification" button ---
+            // --- Add listener for the "Resend Verification" button ---
             const resendVerificationBtn = document.getElementById('resend-verification-btn');
             if (resendVerificationBtn) {
                 resendVerificationBtn.addEventListener('click', async () => {
@@ -1492,7 +1492,7 @@
                 }
                 if (videoModal && videoModal.classList.contains('active')) {
                     hideModal(videoModal);
-                }
+Two.                }
             }
         });
 
