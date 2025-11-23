@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale-1.0">
     <title>Editor</title>
     
     <style>
@@ -622,85 +622,17 @@
         }
         
         /* * ========================================
-         * (MERGED) COURSE PAGE STYLES
+         * (REMOVED) COURSE PAGE STYLES
          * ========================================
          */
-        .course-header {
-            padding: 4rem 0 2rem;
-            text-align: center;
-            background:
-                radial-gradient(circle at 10% 20%, rgba(58, 134, 255, 0.15), transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(58, 134, 255, 0.1), transparent 40%);
-        }
-        
-        /* NEW: Styles for the video module cards */
-        .video-modules-section {
-            padding: 2rem 0 4rem;
-        }
-        .video-module-card {
-            background: var(--bg-medium);
-            border: 2px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem 2rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-        @media (min-width: 768px) {
-            .video-module-card {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-                gap: 2rem;
-            }
-        }
-        .video-module-card h3 {
-            font-size: 1.3rem;
-            margin-bottom: 0.25rem;
-        }
-        .video-module-card p {
-            font-size: 0.95rem;
-            margin-bottom: 0;
-            max-width: 80ch;
-        }
-        .video-module-card .cta-button {
-            flex-shrink: 0; /* Prevents button from shrinking */
-        }
-
-        /* NEW: Styles for the video modal */
-        #video-modal .modal-content {
-            max-width: 900px;
-            width: 90vw;
-            padding: 2rem; /* Reduced padding */
-        }
-        #video-modal-title {
-            margin-bottom: 1.5rem;
-            padding-right: 2rem; /* Space for close button */
-        }
-        #video-modal-embed-container {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            background: #000;
-            border-radius: var(--radius-md);
-            overflow: hidden;
-        }
-        #video-modal-embed-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
 
         /* * ========================================
-         * (MERGED) STATUS / MESSAGES
+         * (UPDATED) STATUS / MESSAGES
          * ========================================
          */
         .status-container {
-            min-height: 60vh;
+            /* This is now a full-page container */
+            min-height: calc(100vh - 70px); /* 100% height minus nav */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -747,8 +679,7 @@
 
     <nav class="top-nav">
         <div class="container">
-            <div class="nav-brand">Editor</div>
-            <div class="nav-auth">
+            <a href="/" class="nav-brand">Editor</a> <div class="nav-auth">
                 <span id="user-display-name"></span>
                 <button id="login-btn" class="cta-button cta-secondary nav-btn">Sign In</button>
                 <button id="logout-btn" class="cta-button cta-secondary nav-btn" style="display: none;">Sign Out</button>
@@ -945,49 +876,13 @@
             </div>
         </footer>
     </div>
-    <div id="course-page-content" style="display: none;">
+    <div id="loading-page-content" style="display: none;">
         <main>
-            <div id="page-container">
-                <div class="status-container" id="loading-state">
-                    <div class="status-box">
-                        <div class="icon loading">⏳</div>
-                        <h2>Checking Access...</h2>
-                        <p>Please wait while we verify your purchase.</p>
-                    </div>
-                </div>
-                
-                <div id="course-unlocked" style="display: none;">
-                    <header class="course-header">
-                        <div class="container">
-                            <h1>Welcome to the Course!</h1>
-                            <p>You're in. Select a video from the modules below to get started.</p>
-                        </div>
-                    </header>
-                    
-                    <section class="container video-modules-section">
-                        <div id="video-modules-container"></div>
-                    </section>
-                    
-                </div>
-            </div> </main>
-    </div>
-    <div id="verify-email-content" style="display: none;">
-        <main>
-            <div class="status-container">
+            <div class="status-container" id="loading-state">
                 <div class="status-box">
-                    <div class="icon">📧</div>
-                    <h2>Please Verify Your Email</h2>
-                    <p>
-                        You're almost in! We sent a verification link to 
-                        <strong id="verify-email-address">you@example.com</strong>.
-                    </p>
-                    <p>
-                        Please check your inbox (and spam folder) and click the link. 
-                        Once verified, sign in again to access the course.
-                    </p>
-                    <button id="resend-verification-btn" class="cta-button cta-secondary" style="margin-top: 1rem;">
-                        Resend Verification Email
-                    </button>
+                    <div class="icon loading">⏳</div>
+                    <h2>Checking Access...</h2>
+                    <p>Please wait while we verify your purchase. This may take a moment.</p>
                 </div>
             </div>
         </main>
@@ -1018,22 +913,12 @@
             </div>
         </div>
     </div>
-    <div id="video-modal" class="modal" aria-hidden="true">
-        <div class="modal-content" role="dialog" aria-modal="true" aria-label="Video Player">
-            <button class="modal-close" id="video-modal-close" aria-label="Close video modal">&times;</button>
-            <h3 id="video-modal-title">Video Title</h3>
-            <div id="video-modal-embed-container">
-                </div>
-        </div>
-    </div>
     <script>
     /* ========== CONSOLIDATED PAGE SCRIPT ========== */
     
     document.addEventListener('DOMContentLoaded', () => {
 
         // --- 1. Modal Helper Functions ---
-        const videoModal = document.getElementById('video-modal'); 
-        
         const showModal = (modalEl) => {
             if(modalEl) {
                 modalEl.classList.add('active');
@@ -1044,11 +929,6 @@
             if(modalEl) {
                 modalEl.classList.remove('active');
                 modalEl.setAttribute('aria-hidden', 'true');
-                
-                if (modalEl.id === 'video-modal') {
-                    const embedContainer = document.getElementById('video-modal-embed-container');
-                    if (embedContainer) embedContainer.innerHTML = ''; 
-                }
             }
         };
 
@@ -1073,102 +953,17 @@
           '100': 'https://buy.stripe.com/test_7sI8ye7hI6vIfJeeUU'
         };
         
+        // This will store the base links before we add user info
         const BASE_PAYMENT_LINKS = { ...PAYMENT_LINK_MAP };
 
+        // <<< STEP 3: YOUR COURSE URL >>>
+        // This is the set URL you want "Premium" users to be redirected to.
+        const COURSE_PAGE_URL = "/course"; // e.g., "https://edit.com/my-course-page"
+
         
-        /* ========== 3. (MERGED) COURSE VIDEO DATA & FUNCTIONS ========== */
+        /* ========== 3. (REMOVED) COURSE VIDEO FUNCTIONS ========== */
+        // All course content is now on a separate page.
         
-        // <<< STEP 3: FILL IN YOUR VIDEO CONTENT >>>
-        const courseVideos = [
-            {
-                title: "Part 1: The Setup",
-                duration: "8:42",
-                description: "Learn how to set up your project files and workspace for maximum efficiency.",
-                embedUrl: "https.www.youtube.com/embed/sgNPozHPv04" // Placeholder link
-            },
-            {
-                title: "Part 2: Basic Editing",
-                duration: "14:10",
-                description: "Master the timeline, cutting, and basic transitions.",
-                embedUrl: "https.www.youtube.com/embed/sgNPozHPv04" // Placeholder link
-            },
-            {
-                title: "Part 3: Audio Magic",
-                duration: "12:05",
-                description: "Make your videos sound professional with audio mixing and sound effects.",
-                embedUrl: "https.www.youtube.com/embed/sgNPozHPv04" // Placeholder link
-            },
-            {
-                title: "Part 4: Color Grading",
-                duration: "10:30",
-                description: "Learn the basics of color correction and cinematic color grading.",
-                embedUrl: "https.www.youtube.com/embed/sgNPozHPv04" // Placeholder link
-            },
-            {
-                title: "Part 5: Exporting",
-                duration: "5:15",
-                description: "Export your final video for YouTube, TikTok, and Instagram.",
-                embedUrl: "https.www.youtube.com/embed/sgNPozHPv04" // Placeholder link
-            }
-        ];
-
-        /**
-         * Populates the course page with video modules.
-         */
-        function buildVideoModules() {
-            const modulesContainer = document.getElementById('video-modules-container');
-            const videoModalTitle = document.getElementById('video-modal-title');
-            const videoModalEmbedContainer = document.getElementById('video-modal-embed-container');
-            
-            if (!modulesContainer || !videoModalTitle || !videoModalEmbedContainer) return;
-            
-            modulesContainer.innerHTML = ''; // Clear it
-            
-            courseVideos.forEach((video) => {
-                const moduleCard = document.createElement('div');
-                moduleCard.className = 'video-module-card';
-                
-                moduleCard.innerHTML = `
-                    <div class="module-info">
-                        <h3>${video.title} (${video.duration})</h3>
-                        <p>${video.description}</p>
-                    </div>
-                    <button class="cta-button cta-primary">Watch</button>
-                `;
-                
-                const watchButton = moduleCard.querySelector('.cta-button');
-                
-                watchButton.addEventListener('click', () => {
-                    videoModalTitle.textContent = video.title;
-                    videoModalEmbedContainer.innerHTML = `
-                        <iframe 
-                            src="${video.embedUrl}?autoplay=1" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                            allowfullscreen>
-                        </iframe>
-                    `;
-                    showModal(videoModal);
-                });
-                
-                modulesContainer.appendChild(moduleCard);
-            });
-        }
-
-        /**
-         * Shows the correct section *within the course page content area*.
-         */
-        function showCourseSection(section) {
-            const loadingState = document.getElementById('loading-state');
-            const courseUnlocked = document.getElementById('course-unlocked');
-
-            if (loadingState) loadingState.style.display = 'none';
-            if (courseUnlocked) courseUnlocked.style.display = 'none';
-            
-            if (section === 'loading' && loadingState) loadingState.style.display = 'flex';
-            if (section === 'unlocked' && courseUnlocked) courseUnlocked.style.display = 'block';
-        }
-
 
         /* ========== 4. FIREBASE & AUTH LOGIC ========== */
 
@@ -1189,13 +984,15 @@
         }
 
         /**
-         * UPDATED: Checks Firestore for payment AND checks user for verification.
-         * This function now controls ALL page content visibility.
+         * UPDATED: Checks Firestore for payment (Premium Status).
+         * This function now controls redirection.
          */
-        async function checkUserAccess(user, userId, isPaymentRedirect) {
+        async function checkUserAccess(userId, isPaymentRedirect) {
             if (!db) {
                 console.error("Firestore (db) is not initialized.");
+                // If DB fails, just show the sales page
                 document.getElementById('sales-page-content').style.display = 'block';
+                document.getElementById('loading-page-content').style.display = 'none';
                 return () => {}; // Return an empty function
             }
             
@@ -1204,54 +1001,37 @@
                 
                 const unsubscribe = purchaseDocRef.onSnapshot(docSnap => {
                     const hasPaid = (docSnap.exists() && docSnap.data().unlocked === true);
-                    const isVerified = user.emailVerified;
 
                     // Get all page containers
                     const salesPageContent = document.getElementById('sales-page-content');
-                    const coursePageContent = document.getElementById('course-page-content');
-                    const verifyEmailContent = document.getElementById('verify-email-content');
-
-                    // Hide all 3 content sections first
-                    if (salesPageContent) salesPageContent.style.display = 'none';
-                    if (coursePageContent) coursePageContent.style.display = 'none';
-                    if (verifyEmailContent) verifyEmailContent.style.display = 'none';
-
-
-                    if (hasPaid && isVerified) {
-                        // --- 1. PAID AND VERIFIED ---
-                        // SUCCESS: Access granted
-                        console.log("Access Granted: User has paid and is verified.");
-                        if (coursePageContent) coursePageContent.style.display = 'block';
-                        showCourseSection('unlocked');
-                        buildVideoModules(); 
+                    const loadingPageContent = document.getElementById('loading-page-content');
                     
-                    } else if (hasPaid && !isVerified) {
-                        // --- 2. PAID, BUT NOT VERIFIED ---
-                        // Show "Verify Email" page
-                        console.log("Access Denied: User has paid but is NOT verified.");
-                        const verifyEmailAddress = document.getElementById('verify-email-address');
-                        if (verifyEmailAddress) verifyEmailAddress.textContent = user.email;
-                        if (verifyEmailContent) verifyEmailContent.style.display = 'block';
-
+                    if (hasPaid) {
+                        // --- 1. PREMIUM USER (PAID) ---
+                        // SUCCESS: Redirect to the course page
+                        console.log("Access Granted: User is Premium. Redirecting to course...");
+                        window.location.href = COURSE_PAGE_URL;
+                        // No need to hide other content, the page will redirect.
+                    
                     } else if (!hasPaid && isPaymentRedirect) {
-                        // --- 3. JUST PAID, WEBHOOK IS SLOW ---
+                        // --- 2. JUST PAID, WEBHOOK IS SLOW ---
                         // Show loading spinner
                         console.log("Payment redirect detected. Waiting for webhook...");
-                        if (coursePageContent) coursePageContent.style.display = 'block';
-                        showCourseSection('loading');
+                        if (salesPageContent) salesPageContent.style.display = 'none';
+                        if (loadingPageContent) loadingPageContent.style.display = 'block';
                         
                     } else {
-                        // --- 4. NOT PAID (and not a payment redirect) ---
+                        // --- 3. NOT PAID (and not a payment redirect) ---
                         // This is the default state for a new (or logged in, non-paying) user
                         console.log("Access Denied: No purchase record found. Showing sales page.");
                         if (salesPageContent) salesPageContent.style.display = 'block';
+                        if (loadingPageContent) loadingPageContent.style.display = 'none';
                     }
                 }, err => {
                      console.error("Error listening to purchase doc:", err);
                      // Fallback: Show sales page on error
                      document.getElementById('sales-page-content').style.display = 'block';
-                     document.getElementById('course-page-content').style.display = 'none';
-                     document.getElementById('verify-email-content').style.display = 'none';
+                     document.getElementById('loading-page-content').style.display = 'none';
                 });
                 
                 return unsubscribe; // Return the function to stop the listener
@@ -1260,13 +1040,12 @@
                 console.error("Error checking Firestore:", err);
                 // Fallback: Show sales page on error
                 document.getElementById('sales-page-content').style.display = 'block';
-                document.getElementById('course-page-content').style.display = 'none';
-                document.getElementById('verify-email-content').style.display = 'none';
+                document.getElementById('loading-page-content').style.display = 'none';
                 return () => {}; // Return an empty function
             }
         }
 
-        let firestoreListener = null; 
+        let firestoreListener = null;
 
         if (auth) {
             // --- ALL UI Elements that depend on auth ---
@@ -1285,18 +1064,11 @@
             
             const allEnrollButtons = document.querySelectorAll('.enroll-btn');
             
-            const videoModalClose = document.getElementById('video-modal-close');
-            
             // --- Auth Modal Listeners ---
             if (loginBtn) loginBtn.addEventListener('click', (e) => { e.preventDefault(); showModal(authModal); });
             if (authClose) authClose.addEventListener('click', () => hideModal(authModal));
             if (authModal) authModal.addEventListener('click', (e) => { if (e.target === authModal) hideModal(authModal); });
             
-            // --- Video Modal Listeners ---
-            if (videoModalClose) videoModalClose.addEventListener('click', () => hideModal(videoModal));
-            if (videoModal) videoModal.addEventListener('click', (e) => { if (e.target === videoModal) hideModal(videoModal); });
-
-
             // --- Auth Action Handlers ---
             if (emailSigninBtn) emailSigninBtn.addEventListener('click', async () => {
                 const email = (emailInput && emailInput.value) || '';
@@ -1324,20 +1096,15 @@
                 authStatus.textContent = 'Creating account...';
                 try {
                     await auth.createUserWithEmailAndPassword(email, pass);
-                    
-                    if (auth.currentUser) {
-                        await auth.currentUser.sendEmailVerification();
-                        authStatus.textContent = 'Account created! Please check your email to verify.';
-                    } else {
-                        authStatus.textContent = 'Account created! Signed in.';
-                    }
+                    // REMOVED: No email verification on signup
+                    authStatus.textContent = 'Account created! Signed in.';
                     
                     setTimeout(() => {
                          hideModal(authModal);
                          authStatus.textContent = '';
                          if(emailInput) emailInput.value = '';
                          if(passwordInput) passwordInput.value = '';
-                    }, 1500); 
+                    }, 1000);
                 } catch (err) {
                     authStatus.textContent = 'Error: ' + err.message;
                 }
@@ -1360,7 +1127,7 @@
 
             if (logoutBtn) logoutBtn.addEventListener('click', async () => {
                 if (firestoreListener) {
-                    firestoreListener(); 
+                    firestoreListener();
                     firestoreListener = null;
                 }
                 await auth.signOut();
@@ -1370,13 +1137,11 @@
             auth.onAuthStateChanged(async (user) => {
                 // --- Get all our page containers ---
                 const salesPageContent = document.getElementById('sales-page-content');
-                const coursePageContent = document.getElementById('course-page-content');
-                const verifyEmailContent = document.getElementById('verify-email-content');
+                const loadingPageContent = document.getElementById('loading-page-content');
                 
                 // Hide all content pages initially
                 if (salesPageContent) salesPageContent.style.display = 'none';
-                if (coursePageContent) coursePageContent.style.display = 'none';
-                if (verifyEmailContent) verifyEmailContent.style.display = 'none';
+                if (loadingPageContent) loadingPageContent.style.display = 'none';
 
                 if (user) {
                     // --- 1. USER IS SIGNED IN ---
@@ -1401,14 +1166,13 @@
                     
                     if (isPaymentRedirect) {
                         console.log("Payment success redirect detected. Showing loading spinner.");
-                        if (coursePageContent) coursePageContent.style.display = 'block';
-                        showCourseSection('loading');
+                        if (loadingPageContent) loadingPageContent.style.display = 'block';
                     }
                     
-                    // Now, let the access checker decide which page to show
-                    // (Course, Verify Email, or Sales Page)
+                    // Now, let the access checker decide what to do
+                    // (Redirect to Course or Show Sales Page)
                     if (firestoreListener) firestoreListener();
-                    firestoreListener = await checkUserAccess(user, user.uid, isPaymentRedirect);
+                    firestoreListener = await checkUserAccess(user.uid, isPaymentRedirect);
                     
                 } else {
                     // --- 4. USER IS SIGNED OUT ---
@@ -1432,28 +1196,6 @@
                 }
             });
             
-            // --- Add listener for the "Resend Verification" button ---
-            const resendVerificationBtn = document.getElementById('resend-verification-btn');
-            if (resendVerificationBtn) {
-                resendVerificationBtn.addEventListener('click', async () => {
-                    if (auth.currentUser) {
-                        try {
-                            await auth.currentUser.sendEmailVerification();
-                            alert("Verification email resent! Please check your inbox.");
-                            resendVerificationBtn.disabled = true;
-                            resendVerificationBtn.textContent = 'Sent!';
-                            setTimeout(() => {
-                                resendVerificationBtn.disabled = false;
-                                resendVerificationBtn.textContent = 'Resend Verification Email';
-                            }, 30000); // Add a 30-second cooldown
-                        } catch (err) {
-                            console.error("Error resending verification:", err);
-                            alert("Error: " + err.message);
-                        }
-                    }
-                });
-            }
-
             // --- MASTER ENROLL BUTTON CLICK LISTENER ---
             allEnrollButtons.forEach(btn => {
                 btn.addEventListener('click', (e) => {
@@ -1461,7 +1203,7 @@
                     const price = btn.dataset.price;
                     
                     if (auth.currentUser) {
-                        // User is signed in, proceed to payment (verification not required to pay)
+                        // User is signed in, proceed to payment
                         const paymentLink = PAYMENT_LINK_MAP[price];
                         if (paymentLink && (paymentLink.includes('https') || paymentLink.includes('http://'))) {
                             if(paymentLink.includes('YOUR_LINK')) {
@@ -1506,9 +1248,7 @@
                 if (authModal && authModal.classList.contains('active')) {
                     hideModal(authModal);
                 }
-                if (videoModal && videoModal.classList.contains('active')) {
-                    hideModal(videoModal);
-                }
+                // No video modal to close anymore
             }
         });
 
