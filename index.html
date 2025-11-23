@@ -632,93 +632,67 @@
                 radial-gradient(circle at 10% 20%, rgba(58, 134, 255, 0.15), transparent 40%),
                 radial-gradient(circle at 90% 80%, rgba(58, 134, 255, 0.1), transparent 40%);
         }
-        .course-content {
+        
+        /* NEW: Styles for the video module cards */
+        .video-modules-section {
             padding: 2rem 0 4rem;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 3rem;
         }
-        @media (min-width: 992px) {
-            .course-content {
-                 grid-template-columns: 3fr 1fr;
+        .video-module-card {
+            background: var(--bg-medium);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem 2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        @media (min-width: 768px) {
+            .video-module-card {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                gap: 2rem;
             }
         }
-        .video-player-main {
-            background: var(--bg-medium);
-            border-radius: var(--radius-lg);
-            border: 2px solid var(--border-color);
+        .video-module-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.25rem;
+        }
+        .video-module-card p {
+            font-size: 0.95rem;
+            margin-bottom: 0;
+            max-width: 80ch;
+        }
+        .video-module-card .cta-button {
+            flex-shrink: 0; /* Prevents button from shrinking */
+        }
+
+        /* NEW: Styles for the video modal */
+        #video-modal .modal-content {
+            max-width: 900px;
+            width: 90vw;
+            padding: 2rem; /* Reduced padding */
+        }
+        #video-modal-title {
+            margin-bottom: 1.5rem;
+            padding-right: 2rem; /* Space for close button */
+        }
+        #video-modal-embed-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            border-radius: var(--radius-md);
             overflow: hidden;
         }
-        .video-embed-placeholder {
-            background-color: #000;
-            aspect-ratio: 16 / 9;
+        #video-modal-embed-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            color: var(--text-medium);
-        }
-        .video-embed-placeholder .icon {
-            font-size: 4rem;
-        }
-        .video-embed-placeholder p {
-            margin: 0;
-            font-size: 1.2rem;
-            font-weight: 500;
-        }
-        .video-player-main .video-title {
-            padding: 1.5rem 2rem;
-        }
-        .video-player-main .video-title h2 {
+            height: 100%;
             border: none;
-            margin-bottom: 0.5rem;
-        }
-        .video-playlist {
-            background: var(--bg-medium);
-            border-radius: var(--radius-lg);
-            border: 2px solid var(--border-color);
-            padding: 1.5rem;
-            height: fit-content;
-        }
-        .video-playlist h3 {
-            margin-bottom: 1.5rem;
-            font-size: 1.25rem;
-            color: var(--accent-blue);
-        }
-        .playlist-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            border: 2px solid transparent;
-        }
-        .playlist-item:hover {
-            background: var(--bg-light);
-        }
-        .playlist-item.active {
-            background: var(--bg-dark);
-            border-color: var(--accent-blue);
-        }
-        .playlist-item .icon {
-            font-size: 1.5rem;
-            color: var(--text-medium);
-        }
-        .playlist-item.active .icon {
-            color: var(--accent-blue);
-        }
-        .playlist-item .item-title {
-            font-weight: 500;
-            color: var(--text-light);
-            margin: 0;
-        }
-        .playlist-item .item-duration {
-            font-size: 0.9rem;
-            color: var(--text-medium);
-            margin: 0;
         }
 
         /* * ========================================
@@ -764,7 +738,6 @@
 
     </style>
 
-    <!-- Firebase (compat) SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -772,7 +745,6 @@
 </head>
 <body>
 
-    <!-- SHARED NAVIGATION -->
     <nav class="top-nav">
         <div class="container">
             <div class="nav-brand">Editor</div>
@@ -785,7 +757,6 @@
     </nav>
 
 
-    <!-- CONTENT WRAPPER 1: SALES PAGE (Visible by default) -->
     <div id="sales-page-content">
         <header class="hero">
             <div class="container">
@@ -839,7 +810,6 @@
                         <p>Start learning immediately. All plans include lifetime access.</p>
                     </div>
                     <div class="pricing-grid">
-                        <!-- Plan 1 -->
                         <div class="price-card">
                             <div class="price-card-header">
                                 <h3>Quick-Start Kit</h3>
@@ -857,7 +827,6 @@
                                 Enroll Now
                             </button>
                         </div>
-                        <!-- Plan 2 -->
                         <div class="price-card">
                             <div class="price-card-header">
                                 <h3>Gaming Specific</h3>
@@ -875,7 +844,6 @@
                                 Enroll Now
                             </button>
                         </div>
-                        <!-- Plan 3 (Recommended) -->
                         <div class="price-card recommended">
                             <div class="price-card-header">
                                 <h3>Advanced</h3>
@@ -892,7 +860,6 @@
                                 Enroll Now
                             </button>
                         </div>
-                        <!-- Plan 4 -->
                         <div class="price-card">
                             <div class="price-card-header">
                                 <h3>Pro Guide</h3>
@@ -978,15 +945,9 @@
             </div>
         </footer>
     </div>
-    <!-- END SALES PAGE CONTENT -->
-
-
-    <!-- CONTENT WRAPPER 2: COURSE PAGE (Hidden by default) -->
     <div id="course-page-content" style="display: none;">
         <main>
-            <!-- This container holds all possible states: Loading, Error, or Success -->
             <div id="page-container">
-                <!-- 1. LOADING STATE (Default) -->
                 <div class="status-container" id="loading-state">
                     <div class="status-box">
                         <div class="icon loading">⏳</div>
@@ -995,42 +956,21 @@
                     </div>
                 </div>
                 
-                <!-- 2. COURSE CONTENT (Hidden by default) -->
                 <div id="course-unlocked" style="display: none;">
                     <header class="course-header">
                         <div class="container">
                             <h1>Welcome to the Course!</h1>
-                            <p>You're in. Select a video from the playlist to get started.</p>
+                            <p>You're in. Select a video from the modules below to get started.</p>
                         </div>
                     </header>
-                    <section class="container course-content">
-                        <!-- Main Video Player -->
-                        <div class="video-player-main">
-                            <div class="video-embed-placeholder" id="video-embed">
-                                <div class="icon">🎬</div>
-                                <p>Select a video to begin</p>
-                            </div>
-                            <div class="video-title">
-                                <h2 id="video-title-display">Welcome!</h2>
-                                <p id="video-description-display">Select a video from the playlist on the right to start learning.</p>
-                            </div>
-                        </div>
-                        <!-- Video Playlist -->
-                        <aside class="video-playlist">
-                            <h3>Course Modules</h3>
-                            <div id="playlist-container">
-                                <!-- Playlist items will be injected here by JavaScript -->
-                            </div>
-                        </aside>
+                    
+                    <section class="container video-modules-section">
+                        <div id="video-modules-container"></div>
                     </section>
+                    
                 </div>
-            </div> <!-- End #page-container -->
-        </main>
+            </div> </main>
     </div>
-    <!-- END COURSE PAGE CONTENT -->
-
-    
-    <!-- AUTH MODAL (SHARED) -->
     <div id="auth-modal" class="modal" aria-hidden="true">
         <div class="modal-content" role="dialog" aria-modal="true" aria-label="Login">
             <button class="modal-close" id="auth-close" aria-label="Close auth modal">&times;</button>
@@ -1057,15 +997,22 @@
             </div>
         </div>
     </div>
-    <!-- END AUTH MODAL -->
-
-
+    <div id="video-modal" class="modal" aria-hidden="true">
+        <div class="modal-content" role="dialog" aria-modal="true" aria-label="Video Player">
+            <button class="modal-close" id="video-modal-close" aria-label="Close video modal">&times;</button>
+            <h3 id="video-modal-title">Video Title</h3>
+            <div id="video-modal-embed-container">
+                </div>
+        </div>
+    </div>
     <script>
     /* ========== CONSOLIDATED PAGE SCRIPT ========== */
     
     document.addEventListener('DOMContentLoaded', () => {
 
         // --- 1. Modal Helper Functions ---
+        const videoModal = document.getElementById('video-modal'); // NEW: Get video modal
+        
         const showModal = (modalEl) => {
             if(modalEl) {
                 modalEl.classList.add('active');
@@ -1076,6 +1023,12 @@
             if(modalEl) {
                 modalEl.classList.remove('active');
                 modalEl.setAttribute('aria-hidden', 'true');
+                
+                // NEW: Stop video playback when the video modal is closed
+                if (modalEl.id === 'video-modal') {
+                    const embedContainer = document.getElementById('video-modal-embed-container');
+                    if (embedContainer) embedContainer.innerHTML = ''; // This stops the video
+                }
             }
         };
 
@@ -1093,8 +1046,6 @@
         };
         
         // <<< STEP 2: YOUR STRIPE PAYMENT LINKS >>>
-        // The key (e.g., '5') MUST match the data-price on your buttons
-        // I've used your $5 test link for all plans for now.
         const PAYMENT_LINK_MAP = {
           '5': 'https://buy.stripe.com/test_7sI8ye7hI6vIfJeeUU',
           '12': 'https://buy.stripe.com/test_7sI8ye7hI6vIfJeeUU',
@@ -1102,118 +1053,85 @@
           '100': 'https://buy.stripe.com/test_7sI8ye7hI6vIfJeeUU'
         };
         
-        // This will store the base links before we add user info
         const BASE_PAYMENT_LINKS = { ...PAYMENT_LINK_MAP };
 
         
         /* ========== 3. (MERGED) COURSE VIDEO DATA & FUNCTIONS ========== */
         
         // <<< STEP 3: FILL IN YOUR VIDEO CONTENT >>>
-        // 'embedUrl' has been changed to 'videoUrl'
-        // This MUST be a direct link to a video file (e.g., .mp4)
         const courseVideos = [
             {
                 title: "Part 1: The Setup",
                 duration: "8:42",
                 description: "Learn how to set up your project files and workspace for maximum efficiency.",
-                embedUrl: "https://www.youtube.com/embed/sgNPozHPv04" // <<< CHANGED from videoUrl
+                embedUrl: "https://www.youtube.com/embed/sgNPozHPv04" // Placeholder link
             },
             {
                 title: "Part 2: Basic Editing",
                 duration: "14:10",
                 description: "Master the timeline, cutting, and basic transitions.",
-                embedUrl: "" // <<< CHANGED from videoUrl (fill this in)
+                embedUrl: "https://www.youtube.com/embed/sgNPozHPv04" // Placeholder link
             },
             {
                 title: "Part 3: Audio Magic",
                 duration: "12:05",
                 description: "Make your videos sound professional with audio mixing and sound effects.",
-                embedUrl: "" // <<< CHANGED from videoUrl (fill this in)
+                embedUrl: "https://www.youtube.com/embed/sgNPozHPv04" // Placeholder link
             },
             {
                 title: "Part 4: Color Grading",
                 duration: "10:30",
                 description: "Learn the basics of color correction and cinematic color grading.",
-                embedUrl: "" // <<< CHANGED from videoUrl (fill this in)
+                embedUrl: "https://www.youtube.com/embed/sgNPozHPv04" // Placeholder link
             },
             {
                 title: "Part 5: Exporting",
                 duration: "5:15",
                 description: "Export your final video for YouTube, TikTok, and Instagram.",
-                embedUrl: "" // <<< CHANGED from videoUrl (fill this in)
+                embedUrl: "https://www.youtube.com/embed/sgNPozHPv04" // Placeholder link
             }
         ];
 
         /**
-         * Loads the clicked video into the main player.
+         * NEW: Populates the course page with video modules.
          */
-        function playVideo(video, clickedElement) {
-            const videoEmbed = document.getElementById('video-embed');
-            const videoTitleDisplay = document.getElementById('video-title-display');
-            const videoDescriptionDisplay = document.getElementById('video-description-display');
+        function buildVideoModules() {
+            const modulesContainer = document.getElementById('video-modules-container');
+            const videoModalTitle = document.getElementById('video-modal-title');
+            const videoModalEmbedContainer = document.getElementById('video-modal-embed-container');
             
-            if (!videoEmbed || !videoTitleDisplay || !videoDescriptionDisplay) return;
-
-            // This is the new part that uses a <video> tag
-            if (video.embedUrl) { // <<< CHANGED from videoUrl
-                videoEmbed.innerHTML = `
-                    <iframe 
-                        style="width: 100%; height: 100%; border: none; aspect-ratio: 16/9;"
-                        src="${video.embedUrl}" 
-                        frameborder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen>
-                    </iframe>
-                `;
-            } else {
-                // This is the fallback if the URL is empty
-                videoEmbed.innerHTML = `
-                    <div class="icon">🚫</div>
-                    <p>Video not available</p>
-                `;
-            }
+            if (!modulesContainer || !videoModalTitle || !videoModalEmbedContainer) return;
             
-            videoTitleDisplay.textContent = video.title;
-            videoDescriptionDisplay.textContent = video.description;
+            modulesContainer.innerHTML = ''; // Clear it
             
-            document.querySelectorAll('.playlist-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            if (clickedElement) {
-                clickedElement.classList.add('active');
-            }
-        }
-
-        /**
-         * Populates the playlist sidebar with videos.
-         */
-        function buildPlaylist() {
-            const playlistContainer = document.getElementById('playlist-container');
-            if (!playlistContainer) return;
-            
-            playlistContainer.innerHTML = ''; // Clear it
-            
-            courseVideos.forEach((video, index) => {
-                const item = document.createElement('div');
-                item.className = 'playlist-item';
-                item.innerHTML = `
-                    <div class="icon">▶️</div>
-                    <div>
-                        <p class="item-title">${video.title}</p>
-                        <p class="item-duration">${video.duration}</p>
+            courseVideos.forEach((video) => {
+                const moduleCard = document.createElement('div');
+                moduleCard.className = 'video-module-card';
+                
+                moduleCard.innerHTML = `
+                    <div class="module-info">
+                        <h3>${video.title} (${video.duration})</h3>
+                        <p>${video.description}</p>
                     </div>
+                    <button class="cta-button cta-primary">Watch</button>
                 `;
                 
-                item.addEventListener('click', () => {
-                    playVideo(video, item);
+                const watchButton = moduleCard.querySelector('.cta-button');
+                
+                watchButton.addEventListener('click', () => {
+                    videoModalTitle.textContent = video.title;
+                    videoModalEmbedContainer.innerHTML = `
+                        <iframe 
+                            src="${video.embedUrl}?autoplay=1" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowfullscreen>
+                        </iframe>
+                    `;
+                    showModal(videoModal);
                 });
                 
-                playlistContainer.appendChild(item);
-                
-                // Auto-play the first video
-                if (index === 0) {
-                    playVideo(video, item);
-                }
+                modulesContainer.appendChild(moduleCard);
             });
         }
 
@@ -1238,7 +1156,6 @@
         let auth;
         let db;
         try {
-            // Check if Firebase config has been filled
             if (FIREBASE_CONFIG.apiKey.includes("AIzaSyB")) {
                 firebase.initializeApp(FIREBASE_CONFIG);
                 auth = firebase.auth();
@@ -1269,20 +1186,19 @@
         const authStatus = document.getElementById('auth-status');
         
         const allEnrollButtons = document.querySelectorAll('.enroll-btn');
+        
+        // NEW: Video Modal UI Elements
+        const videoModalClose = document.getElementById('video-modal-close');
 
         // --- NEW: Check for Stripe Redirect ---
         const urlParams = new URLSearchParams(window.location.search);
         const paymentStatus = urlParams.get('payment');
         
         if (paymentStatus === 'success') {
-            // This is a redirect back from Stripe.
-            // Show the loading/verification screen immediately,
-            // The auth listener will take over from here.
             if (salesPageContent) salesPageContent.style.display = 'none';
             if (coursePageContent) coursePageContent.style.display = 'block';
             showCourseSection('loading');
         }
-        // --- END NEW BLOCK ---
 
         /**
          * Checks Firestore to see if the user has purchased the course.
@@ -1298,26 +1214,24 @@
             try {
                 const purchaseDocRef = db.doc(`users/${userId}/purchases/main-course`);
                 
-                // Use onSnapshot for real-time updates!
                 const unsubscribe = purchaseDocRef.onSnapshot(docSnap => {
                     if (docSnap.exists() && docSnap.data().unlocked === true) {
                         console.log("Access Granted!");
                         salesPageContent.style.display = 'none';
                         coursePageContent.style.display = 'block';
                         showCourseSection('unlocked');
-                        buildPlaylist();
+                        
+                        // NEW: Call the new function
+                        buildVideoModules();
+                        
                     } else {
                         console.log("Access Denied. No purchase record found.");
                         
-                        // Check if we are in the middle of verifying a payment.
                         const currentParams = new URLSearchParams(window.location.search);
                         if (currentParams.get('payment') !== 'success') {
-                            // Only show sales page if we are NOT verifying.
                             salesPageContent.style.display = 'block';
                             coursePageContent.style.display = 'none';
                         }
-                        // If we *are* verifying, we do nothing,
-                        // which leaves the loading spinner visible.
                     }
                 }, err => {
                      console.error("Error listening to purchase doc:", err);
@@ -1335,13 +1249,18 @@
             }
         }
 
-        let firestoreListener = null; // Variable to hold our listener
+        let firestoreListener = null;
 
         if (auth) {
             // --- Auth Modal Listeners ---
             if (loginBtn) loginBtn.addEventListener('click', (e) => { e.preventDefault(); showModal(authModal); });
             if (authClose) authClose.addEventListener('click', () => hideModal(authModal));
             if (authModal) authModal.addEventListener('click', (e) => { if (e.target === authModal) hideModal(authModal); });
+            
+            // --- NEW: Video Modal Listeners ---
+            if (videoModalClose) videoModalClose.addEventListener('click', () => hideModal(videoModal));
+            if (videoModal) videoModal.addEventListener('click', (e) => { if (e.target === videoModal) hideModal(videoModal); });
+
 
             // --- Auth Action Handlers ---
             if (emailSigninBtn) emailSigninBtn.addEventListener('click', async () => {
@@ -1421,10 +1340,6 @@
                         PAYMENT_LINK_MAP[key] = `${baseUrl}?client_reference_id=${userId}`;
                     }
                     allEnrollButtons.forEach(btn => btn.disabled = false);
-
-                    // salesPageContent.style.display = 'none';
-                    // coursePageContent.style.display = 'block';
-                    // showCourseSection('loading');
                     
                     if (firestoreListener) firestoreListener();
                     firestoreListener = await checkUserAccess(user.uid);
@@ -1438,9 +1353,6 @@
                     for (const key in BASE_PAYMENT_LINKS) {
                         PAYMENT_LINK_MAP[key] = BASE_PAYMENT_LINKS[key];
                     }
-                    // This was the bug! We must check if the user is signed out, and if so,
-                    // show the modal instead of doing nothing.
-                    // allEnrollButtons.forEach(btn => btn.disabled = true); // <-- REMOVED THIS LINE
 
                     if (firestoreListener) {
                         firestoreListener();
@@ -1494,6 +1406,10 @@
             if (e.key === 'Escape') {
                 if (authModal && authModal.classList.contains('active')) {
                     hideModal(authModal);
+                }
+                // NEW: Close video modal with Escape
+                if (videoModal && videoModal.classList.contains('active')) {
+                    hideModal(videoModal);
                 }
             }
         });
