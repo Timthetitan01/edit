@@ -1206,17 +1206,9 @@
         
         const videoModalClose = document.getElementById('video-modal-close');
 
-        // --- Check for Stripe Redirect ---
-        const urlParams = new URLSearchParams(window.location.search);
-        const paymentStatus = urlParams.get('payment');
-        
-        if (paymentStatus === 'success') {
-            const salesPage = document.getElementById('sales-page-content');
-            const coursePage = document.getElementById('course-page-content');
-            if (salesPage) salesPage.style.display = 'none';
-            if (coursePage) coursePage.style.display = 'block';
-            showCourseSection('loading');
-        }
+        // --- REMOVED CONFLICTING CODE BLOCK ---
+        // The block that checked for ?payment=success here has been removed.
+        // All logic is now handled by the auth.onAuthStateChanged listener.
 
         /**
          * Checks Firestore to see if the user has purchased the course.
@@ -1394,7 +1386,7 @@
                         // --- 3. USER IS SIGNED IN AND VERIFIED ---
                         console.log("User signed in and VERIFIED. Checking for payment...");
                         
-                        // SIMPLIFIED: ALWAYS show the course page container (which has the loading spinner)
+                        // ALWAYS show the course page container (which has the loading spinner)
                         if (coursePageContent) coursePageContent.style.display = 'block';
                         showCourseSection('loading');
                         
@@ -1492,7 +1484,7 @@
                 }
                 if (videoModal && videoModal.classList.contains('active')) {
                     hideModal(videoModal);
-Two.                }
+                }
             }
         });
 
