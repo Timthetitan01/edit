@@ -1067,14 +1067,20 @@
             
             // --- Auth Modal Listeners ---
             if (loginBtn) loginBtn.addEventListener('click', (e) => { e.preventDefault(); showModal(authModal); });
-            if (authClose) authClose.addEventListener('click', () => hideModal(authModal));
-            if (authModal) authModal.addEventListener('click', (e) => { if (e.target === authModal) hideModal(authModal); });
+            if (authClose) authClose.addEventListener('click', () => {
+                pendingPurchasePrice = null; // Clear pending purchase on modal close
+                hideModal(authModal);
+            });
+            if (authModal) authModal.addEventListener('click', (e) => {
+                if (e.target === authModal) {
+                    pendingPurchasePrice = null; // Clear pending purchase on modal close
+                    hideModal(authModal);
+                }
+            });
             
             
             // --- NEW: Function to run after any successful auth ---
             const handlePostAuth = () => {
-                hideModal(authModal);
-                
                 if (pendingPurchasePrice) {
                     console.log(`Pending purchase found for price: ${pendingPurchasePrice}. Redirecting to Stripe.`);
                     
@@ -1083,6 +1089,7 @@
                     let paymentLink = PAYMENT_LINK_MAP[pendingPurchasePrice];
                     
                     if (paymentLink && userId) {
+                         // We must use the BASE link to construct the new one
                          paymentLink = `${BASE_PAYMENT_LINKS[pendingPurchasePrice]}?client_reference_id=${userId}`;
                          window.open(paymentLink, '_blank');
                     } else {
@@ -1092,10 +1099,11 @@
                     pendingPurchasePrice = null; // Clear the pending purchase
                 }
                 
-                // Clear form inputs
+                // Clear form inputs and hide modal
                 if(emailInput) emailInput.value = '';
                 if(passwordInput) passwordInput.value = '';
                 if(authStatus) authStatus.textContent = '';
+                hideModal(authModal);
             };
             
 
@@ -1182,6 +1190,12 @@
                     if (isPaymentRedirect) {
                         console.log("Payment success redirect detected. Showing loading spinner.");
                         if (loadingPageContent) loadingPageContent.style.display = 'block';
+                    } else {
+                        // THIS IS THE FIX: By default, show the sales page
+                        // if it's a normal login (not a payment redirect).
+                        // checkUserAccess will then override this if they are Premium.
+                        console.log("Normal login. Showing sales page by default.");
+                        if (salesPageContent) salesPageContent.style.display = 'block';
                     }
                     
                     // Now, let the access checker decide what to do
@@ -1259,6 +1273,7 @@
             if (e.key === 'Escape') {
                 const authModal = document.getElementById('auth-modal'); // Re-get here for safety
                 if (authModal && authModal.classList.contains('active')) {
+                    pendingPurchasePrice = null; // Clear pending purchase on modal close
                     hideModal(authModal);
                 }
             }
