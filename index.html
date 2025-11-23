@@ -1188,28 +1188,6 @@
             console.error("Firebase initialization error", e);
         }
 
-        // --- All UI Elements ---
-        const loginBtn = document.getElementById('login-btn');
-        const logoutBtn = document.getElementById('logout-btn');
-        const userDisplayName = document.getElementById('user-display-name');
-        
-        const authModal = document.getElementById('auth-modal');
-        const authClose = document.getElementById('auth-close');
-        const emailSigninBtn = document.getElementById('email-signin-btn');
-        const emailSignupBtn = document.getElementById('email-signup-btn');
-        const googleSigninBtn = document.getElementById('google-signin-btn');
-        const emailInput = document.getElementById('email-input');
-        const passwordInput = document.getElementById('password-input');
-        const authStatus = document.getElementById('auth-status');
-        
-        const allEnrollButtons = document.querySelectorAll('.enroll-btn');
-        
-        const videoModalClose = document.getElementById('video-modal-close');
-
-        // --- REMOVED CONFLICTING CODE BLOCK ---
-        // The block that checked for ?payment=success here has been removed.
-        // All logic is now handled by the auth.onAuthStateChanged listener.
-
         /**
          * Checks Firestore to see if the user has purchased the course.
          */
@@ -1267,6 +1245,25 @@
         let firestoreListener = null;
 
         if (auth) {
+            // --- ALL UI Elements that depend on auth ---
+            // Moved all element definitions INSIDE the if(auth) block
+            const loginBtn = document.getElementById('login-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            const userDisplayName = document.getElementById('user-display-name');
+            
+            const authModal = document.getElementById('auth-modal');
+            const authClose = document.getElementById('auth-close');
+            const emailSigninBtn = document.getElementById('email-signin-btn');
+            const emailSignupBtn = document.getElementById('email-signup-btn');
+            const googleSigninBtn = document.getElementById('google-signin-btn');
+            const emailInput = document.getElementById('email-input');
+            const passwordInput = document.getElementById('password-input');
+            const authStatus = document.getElementById('auth-status');
+            
+            const allEnrollButtons = document.querySelectorAll('.enroll-btn');
+            
+            const videoModalClose = document.getElementById('video-modal-close');
+            
             // --- Auth Modal Listeners ---
             if (loginBtn) loginBtn.addEventListener('click', (e) => { e.preventDefault(); showModal(authModal); });
             if (authClose) authClose.addEventListener('click', () => hideModal(authModal));
@@ -1468,17 +1465,26 @@
         } else {
             console.error("Firebase 'auth' object is not available. UI buttons will not work.");
             // Fallback for when Firebase totally fails to init
+            const allEnrollButtons = document.querySelectorAll('.enroll-btn');
+            const loginBtn = document.getElementById('login-btn');
+            
+            const fallbackAction = (e) => {
+                e.preventDefault();
+                alert("Error: Page scripts could not load. Please refresh and try again.");
+            };
+            
              allEnrollButtons.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    alert("Error: Page scripts could not load. Please refresh and try again.");
-                });
+                btn.addEventListener('click', fallbackAction);
              });
+             if (loginBtn) {
+                 loginBtn.addEventListener('click', fallbackAction);
+             }
         } // end if(auth)
 
         // --- 5. Accessibility: Close Modals with Escape ---
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
+                const authModal = document.getElementById('auth-modal'); // Re-get here for safety
                 if (authModal && authModal.classList.contains('active')) {
                     hideModal(authModal);
                 }
