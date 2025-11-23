@@ -1084,31 +1084,31 @@
                 title: "Part 1: The Setup",
                 duration: "8:42",
                 description: "Learn how to set up your project files and workspace for maximum efficiency.",
-                embedUrl: "https://www.youtube.com/embed/sgNPozHPv04" // Placeholder link
+                embedUrl: "https.www.youtube.com/embed/sgNPozHPv04" // Placeholder link
             },
             {
                 title: "Part 2: Basic Editing",
                 duration: "14:10",
                 description: "Master the timeline, cutting, and basic transitions.",
-                embedUrl: "https://www.youtube.com/embed/sgNPozHPv04" // Placeholder link
+                embedUrl: "https.www.youtube.com/embed/sgNPozHPv04" // Placeholder link
             },
             {
                 title: "Part 3: Audio Magic",
                 duration: "12:05",
                 description: "Make your videos sound professional with audio mixing and sound effects.",
-                embedUrl: "https://www.youtube.com/embed/sgNPozHPv04" // Placeholder link
+                embedUrl: "https.www.youtube.com/embed/sgNPozHPv04" // Placeholder link
             },
             {
                 title: "Part 4: Color Grading",
                 duration: "10:30",
                 description: "Learn the basics of color correction and cinematic color grading.",
-                embedUrl: "https://www.youtube.com/embed/sgNPozHPv04" // Placeholder link
+                embedUrl: "https.www.youtube.com/embed/sgNPozHPv04" // Placeholder link
             },
             {
                 title: "Part 5: Exporting",
                 duration: "5:15",
                 description: "Export your final video for YouTube, TikTok, and Instagram.",
-                embedUrl: "https://www.youtube.com/embed/sgNPozHPv04" // Placeholder link
+                embedUrl: "https.www.youtube.com/embed/sgNPozHPv04" // Placeholder link
             }
         ];
 
@@ -1192,7 +1192,7 @@
          * UPDATED: Checks Firestore for payment AND checks user for verification.
          * This function now controls ALL page content visibility.
          */
-        async function checkUserAccess(user, userId) {
+        async function checkUserAccess(user, userId, isPaymentRedirect) {
             if (!db) {
                 console.error("Firestore (db) is not initialized.");
                 document.getElementById('sales-page-content').style.display = 'block';
@@ -1205,8 +1205,6 @@
                 const unsubscribe = purchaseDocRef.onSnapshot(docSnap => {
                     const hasPaid = (docSnap.exists() && docSnap.data().unlocked === true);
                     const isVerified = user.emailVerified;
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const isPaymentRedirect = (urlParams.get('payment') === 'success');
 
                     // Get all page containers
                     const salesPageContent = document.getElementById('sales-page-content');
@@ -1398,9 +1396,10 @@
                     allEnrollButtons.forEach(btn => btn.disabled = false);
 
                     // --- NEW LOGIC: Check URL for payment success ---
-                    // We only show the loading spinner IF they just paid.
                     const urlParams = new URLSearchParams(window.location.search);
-                    if (urlParams.get('payment') === 'success') {
+                    const isPaymentRedirect = (urlParams.get('payment') === 'success');
+                    
+                    if (isPaymentRedirect) {
                         console.log("Payment success redirect detected. Showing loading spinner.");
                         if (coursePageContent) coursePageContent.style.display = 'block';
                         showCourseSection('loading');
@@ -1409,7 +1408,7 @@
                     // Now, let the access checker decide which page to show
                     // (Course, Verify Email, or Sales Page)
                     if (firestoreListener) firestoreListener();
-                    firestoreListener = await checkUserAccess(user, user.uid);
+                    firestoreListener = await checkUserAccess(user, user.uid, isPaymentRedirect);
                     
                 } else {
                     // --- 4. USER IS SIGNED OUT ---
