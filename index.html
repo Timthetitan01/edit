@@ -946,18 +946,20 @@
         };
         
         // <<< STEP 2: YOUR STRIPE PAYMENT LINKS >>>
-        const PAYMENT_LINK_MAP = {
+        // These are the BASE links without user data
+        const BASE_PAYMENT_LINKS = {
           '5': 'https://buy.stripe.com/test_7sI8ye7hI6vIfJeeUU',
           '12': 'https://buy.stripe.com/test_7sI8ye7hI6vIfJeeUU',
           '25': 'https://buy.stripe.com/test_7sI8ye7hI6vIfJeeUU',
           '100': 'https://buy.stripe.com/test_7sI8ye7hI6vIfJeeUU'
         };
         
-        const BASE_PAYMENT_LINKS = { ...PAYMENT_LINK_MAP };
+        // This will be updated with the user ID when they log in
+        const PAYMENT_LINK_MAP = { ...BASE_PAYMENT_LINKS };
 
         // <<< STEP 3: YOUR COURSE URL >>>
         // This is the set URL you want "Premium" users to be redirected to.
-        const COURSE_PAGE_URL = "/course"; // e.g., "https://your-domain.com/course-page.html"
+        const COURSE_PAGE_URL = "/course"; // e.g., "https.your-domain.com/course-page.html"
 
         
         /* ========== 3. (REMOVED) COURSE VIDEO FUNCTIONS ========== */
@@ -1086,11 +1088,10 @@
                     
                     // Manually update the payment link with the user ID
                     const userId = auth.currentUser.uid;
-                    let paymentLink = PAYMENT_LINK_MAP[pendingPurchasePrice];
                     
-                    if (paymentLink && userId) {
+                    if (BASE_PAYMENT_LINKS[pendingPurchasePrice] && userId) {
                          // We must use the BASE link to construct the new one
-                         paymentLink = `${BASE_PAYMENT_LINKS[pendingPurchasePrice]}?client_reference_id=${userId}`;
+                         const paymentLink = `${BASE_PAYMENT_LINKS[pendingPurchasePrice]}?client_reference_id=${userId}`;
                          window.open(paymentLink, '_blank');
                     } else {
                         console.error("Could not create payment link. User or link missing.");
@@ -1179,7 +1180,8 @@
                     const userId = user.uid;
                     for (const key in BASE_PAYMENT_LINKS) {
                         const baseUrl = BASE_PAYMENT_LINKS[key];
-                        PAYMENT_LINK_MAP[key] = `${baseUrl}?client_reference_id=${userId}`;
+                        // This map is now just for reference, we build the link on the fly
+                        PAYMENT_LINK_MAP[key] = `${baseUrl}?client_reference_id=${userId}`; 
                     }
                     allEnrollButtons.forEach(btn => btn.disabled = false);
 
@@ -1190,12 +1192,6 @@
                     if (isPaymentRedirect) {
                         console.log("Payment success redirect detected. Showing loading spinner.");
                         if (loadingPageContent) loadingPageContent.style.display = 'block';
-                    } else {
-                        // THIS IS THE FIX: By default, show the sales page
-                        // if it's a normal login (not a payment redirect).
-                        // checkUserAccess will then override this if they are Premium.
-                        console.log("Normal login. Showing sales page by default.");
-                        if (salesPageContent) salesPageContent.style.display = 'block';
                     }
                     
                     // Now, let the access checker decide what to do
@@ -1225,7 +1221,7 @@
                 }
             });
             
-            // --- MASTER ENROLL BUTTON CLICK LISTENER (UPDATED) ---
+            // --- MASTER ENROLL BUTTON CLICK LISTENER (FIXED!) ---
             allEnrollButtons.forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -1233,11 +1229,16 @@
                     
                     if (auth.currentUser) {
                         // User is signed in, proceed to payment
-                        const paymentLink = PAYMENT_LINK_MAP[price];
-                        if (paymentLink && (paymentLink.includes('https') || paymentLink.includes('http://'))) {
-                            window.open(paymentLink, '_blank');
+                        // THIS IS THE FIX: We build the link HERE, not from the map.
+                        const userId = auth.currentUser.uid;
+                        const baseUrl = BASE_PAYMENT_LINKS[price];
+                        
+                        if (baseUrl && userId) {
+                             const paymentLink = `${baseUrl}?client_reference_id=${userId}`;
+                             console.log(`User ${userId} clicking pay for price ${price}. Link: ${paymentLink}`);
+                             window.open(paymentLink, '_blank');
                         } else {
-                            console.error(`Configuration error: No valid Payment Link for price '${price}'.`);
+                            console.error(`Configuration error: No base link for price '${price}'.`);
                         }
                     } else {
                         // User is NOT signed in, show the modal
