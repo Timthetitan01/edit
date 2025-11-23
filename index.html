@@ -971,6 +971,27 @@
                 </div>
             </div> </main>
     </div>
+    <div id="verify-email-content" style="display: none;">
+        <main>
+            <div class="status-container">
+                <div class="status-box">
+                    <div class="icon">📧</div>
+                    <h2>Please Verify Your Email</h2>
+                    <p>
+                        We sent a verification link to
+                        <strong id="verify-email-address">you@example.com</strong>.
+                    </p>
+                    <p>
+                        Please check your inbox (and spam folder) and click the link.
+                        Once verified, sign in again to access the course.
+                    </p>
+                    <button id="resend-verification-btn" class="cta-button cta-secondary" style="margin-top: 1rem;">
+                        Resend Verification Email
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
     <div id="auth-modal" class="modal" aria-hidden="true">
         <div class="modal-content" role="dialog" aria-modal="true" aria-label="Login">
             <button class="modal-close" id="auth-close" aria-label="Close auth modal">&times;</button>
@@ -1011,7 +1032,7 @@
     document.addEventListener('DOMContentLoaded', () => {
 
         // --- 1. Modal Helper Functions ---
-        const videoModal = document.getElementById('video-modal'); // NEW: Get video modal
+        const videoModal = document.getElementById('video-modal');
         
         const showModal = (modalEl) => {
             if(modalEl) {
@@ -1024,10 +1045,9 @@
                 modalEl.classList.remove('active');
                 modalEl.setAttribute('aria-hidden', 'true');
                 
-                // NEW: Stop video playback when the video modal is closed
                 if (modalEl.id === 'video-modal') {
                     const embedContainer = document.getElementById('video-modal-embed-container');
-                    if (embedContainer) embedContainer.innerHTML = ''; // This stops the video
+                    if (embedContainer) embedContainer.innerHTML = '';
                 }
             }
         };
@@ -1093,7 +1113,7 @@
         ];
 
         /**
-         * NEW: Populates the course page with video modules.
+         * Populates the course page with video modules.
          */
         function buildVideoModules() {
             const modulesContainer = document.getElementById('video-modules-container');
@@ -1169,9 +1189,6 @@
         }
 
         // --- All UI Elements ---
-        const salesPageContent = document.getElementById('sales-page-content');
-        const coursePageContent = document.getElementById('course-page-content');
-
         const loginBtn = document.getElementById('login-btn');
         const logoutBtn = document.getElementById('logout-btn');
         const userDisplayName = document.getElementById('user-display-name');
@@ -1187,16 +1204,17 @@
         
         const allEnrollButtons = document.querySelectorAll('.enroll-btn');
         
-        // NEW: Video Modal UI Elements
         const videoModalClose = document.getElementById('video-modal-close');
 
-        // --- NEW: Check for Stripe Redirect ---
+        // --- Check for Stripe Redirect ---
         const urlParams = new URLSearchParams(window.location.search);
         const paymentStatus = urlParams.get('payment');
         
         if (paymentStatus === 'success') {
-            if (salesPageContent) salesPageContent.style.display = 'none';
-            if (coursePageContent) coursePageContent.style.display = 'block';
+            const salesPage = document.getElementById('sales-page-content');
+            const coursePage = document.getElementById('course-page-content');
+            if (salesPage) salesPage.style.display = 'none';
+            if (coursePage) coursePage.style.display = 'block';
             showCourseSection('loading');
         }
 
@@ -1206,8 +1224,8 @@
         async function checkUserAccess(userId) {
             if (!db) {
                 console.error("Firestore (db) is not initialized.");
-                salesPageContent.style.display = 'block';
-                coursePageContent.style.display = 'none';
+                document.getElementById('sales-page-content').style.display = 'block';
+                document.getElementById('course-page-content').style.display = 'none';
                 return () => {}; // Return an empty function
             }
             
@@ -1217,11 +1235,10 @@
                 const unsubscribe = purchaseDocRef.onSnapshot(docSnap => {
                     if (docSnap.exists() && docSnap.data().unlocked === true) {
                         console.log("Access Granted!");
-                        salesPageContent.style.display = 'none';
-                        coursePageContent.style.display = 'block';
+                        document.getElementById('sales-page-content').style.display = 'none';
+                        document.getElementById('course-page-content').style.display = 'block';
                         showCourseSection('unlocked');
                         
-                        // NEW: Call the new function
                         buildVideoModules();
                         
                     } else {
@@ -1229,22 +1246,22 @@
                         
                         const currentParams = new URLSearchParams(window.location.search);
                         if (currentParams.get('payment') !== 'success') {
-                            salesPageContent.style.display = 'block';
-                            coursePageContent.style.display = 'none';
+                            document.getElementById('sales-page-content').style.display = 'block';
+                            document.getElementById('course-page-content').style.display = 'none';
                         }
                     }
                 }, err => {
                      console.error("Error listening to purchase doc:", err);
-                     salesPageContent.style.display = 'block';
-                     coursePageContent.style.display = 'none';
+                     document.getElementById('sales-page-content').style.display = 'block';
+                     document.getElementById('course-page-content').style.display = 'none';
                 });
                 
                 return unsubscribe; // Return the function to stop the listener
 
             } catch (err) {
                 console.error("Error checking Firestore:", err);
-                salesPageContent.style.display = 'block';
-                coursePageContent.style.display = 'none';
+                document.getElementById('sales-page-content').style.display = 'block';
+                document.getElementById('course-page-content').style.display = 'none';
                 return () => {}; // Return an empty function
             }
         }
@@ -1257,7 +1274,7 @@
             if (authClose) authClose.addEventListener('click', () => hideModal(authModal));
             if (authModal) authModal.addEventListener('click', (e) => { if (e.target === authModal) hideModal(authModal); });
             
-            // --- NEW: Video Modal Listeners ---
+            // --- Video Modal Listeners ---
             if (videoModalClose) videoModalClose.addEventListener('click', () => hideModal(videoModal));
             if (videoModal) videoModal.addEventListener('click', (e) => { if (e.target === videoModal) hideModal(videoModal); });
 
@@ -1289,13 +1306,22 @@
                 authStatus.textContent = 'Creating account...';
                 try {
                     await auth.createUserWithEmailAndPassword(email, pass);
-                    authStatus.textContent = 'Account created! Signed in.';
+                    
+                    // --- NEW: Send verification email ---
+                    if (auth.currentUser) {
+                        await auth.currentUser.sendEmailVerification();
+                        authStatus.textContent = 'Account created! Please check your email to verify.';
+                    } else {
+                        authStatus.textContent = 'Account created! Signed in.';
+                    }
+                    // --- END NEW BLOCK ---
+                    
                     setTimeout(() => {
                          hideModal(authModal);
                          authStatus.textContent = '';
                          if(emailInput) emailInput.value = '';
                          if(passwordInput) passwordInput.value = '';
-                    }, 500);
+                    }, 1500); // Increased timeout to read the message
                 } catch (err) {
                     authStatus.textContent = 'Error: ' + err.message;
                 }
@@ -1324,32 +1350,67 @@
                 await auth.signOut();
             });
 
-            // --- MASTER AUTH STATE LISTENER ---
+            // --- MASTER AUTH STATE LISTENER (UPDATED) ---
             auth.onAuthStateChanged(async (user) => {
+                // --- Get all our page containers ---
+                const salesPageContent = document.getElementById('sales-page-content');
+                const coursePageContent = document.getElementById('course-page-content');
+                const verifyEmailContent = document.getElementById('verify-email-content');
+                const verifyEmailAddress = document.getElementById('verify-email-address');
+                
+                // First, hide everything
+                if (salesPageContent) salesPageContent.style.display = 'none';
+                if (coursePageContent) coursePageContent.style.display = 'none';
+                if (verifyEmailContent) verifyEmailContent.style.display = 'none';
+
                 if (user) {
-                    // --- USER IS SIGNED IN ---
+                    // --- 1. USER IS SIGNED IN ---
                     const name = user.displayName || user.email.split('@')[0];
                     if (userDisplayName) userDisplayName.textContent = `Welcome, ${name}`;
                     if (userDisplayName) userDisplayName.style.display = 'inline';
                     if (loginBtn) loginBtn.style.display = 'none';
                     if (logoutBtn) logoutBtn.style.display = 'inline-block';
 
+                    // Update payment links (in case they need to buy)
                     const userId = user.uid;
                     for (const key in BASE_PAYMENT_LINKS) {
                         const baseUrl = BASE_PAYMENT_LINKS[key];
                         PAYMENT_LINK_MAP[key] = `${baseUrl}?client_reference_id=${userId}`;
                     }
                     allEnrollButtons.forEach(btn => btn.disabled = false);
-                    
-                    if (firestoreListener) firestoreListener();
-                    firestoreListener = await checkUserAccess(user.uid);
+
+                    // --- NEW 3-POINT CHECK ---
+                    if (!user.emailVerified) {
+                        // --- 2. USER IS SIGNED IN, BUT EMAIL NOT VERIFIED ---
+                        console.log("User signed in, but email is NOT verified.");
+                        if (verifyEmailAddress) verifyEmailAddress.textContent = user.email;
+                        if (verifyEmailContent) verifyEmailContent.style.display = 'block';
+
+                    } else {
+                        // --- 3. USER IS SIGNED IN AND VERIFIED ---
+                        console.log("User signed in and VERIFIED. Checking for payment...");
+                        
+                        // Show loading spinner while we check for payment
+                        // (Only if not coming from Stripe redirect, which already showed it)
+                        if (paymentStatus !== 'success') {
+                            if (coursePageContent) coursePageContent.style.display = 'block';
+                            showCourseSection('loading');
+                        }
+                        
+                        // Now check for payment (this function already handles showing
+                        // the sales page or the course page)
+                        if (firestoreListener) firestoreListener();
+                        firestoreListener = await checkUserAccess(user.uid);
+                    }
                     
                 } else {
-                    // --- USER IS SIGNED OUT ---
+                    // --- 4. USER IS SIGNED OUT ---
+                    console.log("User is signed out.");
                     if (userDisplayName) userDisplayName.style.display = 'none';
                     if (loginBtn) loginBtn.style.display = 'inline-block';
                     if (logoutBtn) logoutBtn.style.display = 'none';
 
+                    // Reset payment links
                     for (const key in BASE_PAYMENT_LINKS) {
                         PAYMENT_LINK_MAP[key] = BASE_PAYMENT_LINKS[key];
                     }
@@ -1359,10 +1420,32 @@
                         firestoreListener = null;
                     }
                     
-                    salesPageContent.style.display = 'block';
-                    coursePageContent.style.display = 'none';
+                    // Show the sales page
+                    if (salesPageContent) salesPageContent.style.display = 'block';
                 }
             });
+            
+            // --- NEW: Add listener for the "Resend Verification" button ---
+            const resendVerificationBtn = document.getElementById('resend-verification-btn');
+            if (resendVerificationBtn) {
+                resendVerificationBtn.addEventListener('click', async () => {
+                    if (auth.currentUser) {
+                        try {
+                            await auth.currentUser.sendEmailVerification();
+                            alert("Verification email resent! Please check your inbox.");
+                            resendVerificationBtn.disabled = true;
+                            resendVerificationBtn.textContent = 'Sent!';
+                            setTimeout(() => {
+                                resendVerificationBtn.disabled = false;
+                                resendVerificationBtn.textContent = 'Resend Verification Email';
+                            }, 30000); // Add a 30-second cooldown
+                        } catch (err) {
+                            console.error("Error resending verification:", err);
+                            alert("Error: " + err.message);
+                        }
+                    }
+                });
+            }
 
             // --- MASTER ENROLL BUTTON CLICK LISTENER ---
             allEnrollButtons.forEach(btn => {
@@ -1407,7 +1490,6 @@
                 if (authModal && authModal.classList.contains('active')) {
                     hideModal(authModal);
                 }
-                // NEW: Close video modal with Escape
                 if (videoModal && videoModal.classList.contains('active')) {
                     hideModal(videoModal);
                 }
