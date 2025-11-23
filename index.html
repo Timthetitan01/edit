@@ -978,11 +978,11 @@
                     <div class="icon">📧</div>
                     <h2>Please Verify Your Email</h2>
                     <p>
-                        We sent a verification link to
+                        We sent a verification link to 
                         <strong id="verify-email-address">you@example.com</strong>.
                     </p>
                     <p>
-                        Please check your inbox (and spam folder) and click the link.
+                        Please check your inbox (and spam folder) and click the link. 
                         Once verified, sign in again to access the course.
                     </p>
                     <button id="resend-verification-btn" class="cta-button cta-secondary" style="margin-top: 1rem;">
@@ -1032,7 +1032,7 @@
     document.addEventListener('DOMContentLoaded', () => {
 
         // --- 1. Modal Helper Functions ---
-        const videoModal = document.getElementById('video-modal');
+        const videoModal = document.getElementById('video-modal'); 
         
         const showModal = (modalEl) => {
             if(modalEl) {
@@ -1047,7 +1047,7 @@
                 
                 if (modalEl.id === 'video-modal') {
                     const embedContainer = document.getElementById('video-modal-embed-container');
-                    if (embedContainer) embedContainer.innerHTML = '';
+                    if (embedContainer) embedContainer.innerHTML = ''; 
                 }
             }
         };
@@ -1189,9 +1189,13 @@
         }
 
         /**
-         * Checks Firestore to see if the user has purchased the course.
+         * NEW: Checks Firestore for payment AND checks user for verification.
+         * This function now handles all 3 states:
+         * 1. Paid + Verified = Show Course
+         * 2. Paid + Not Verified = Show Verify Email Screen
+         * 3. Not Paid = Show Sales Page (or loading spinner if just paid)
          */
-        async function checkUserAccess(userId) {
+        async function checkUserAccess(user, userId) { // <-- Takes the full user object now
             if (!db) {
                 console.error("Firestore (db) is not initialized.");
                 document.getElementById('sales-page-content').style.display = 'block';
@@ -1203,33 +1207,59 @@
                 const purchaseDocRef = db.doc(`users/${userId}/purchases/main-course`);
                 
                 const unsubscribe = purchaseDocRef.onSnapshot(docSnap => {
-                    if (docSnap.exists() && docSnap.data().unlocked === true) {
+                    const hasPaid = (docSnap.exists() && docSnap.data().unlocked === true);
+                    const isVerified = user.emailVerified;
+
+                    // Get all page containers
+                    const salesPageContent = document.getElementById('sales-page-content');
+                    const coursePageContent = document.getElementById('course-page-content');
+                    const verifyEmailContent = document.getElementById('verify-email-content');
+
+                    // Hide all first
+                    if (salesPageContent) salesPageContent.style.display = 'none';
+                    if (coursePageContent) coursePageContent.style.display = 'none';
+                    if (verifyEmailContent) verifyEmailContent.style.display = 'none';
+
+
+                    if (hasPaid && isVerified) {
+                        // --- 1. PAID AND VERIFIED ---
                         // SUCCESS: Access granted
-                        console.log("Access Granted!");
-                        document.getElementById('sales-page-content').style.display = 'none';
-                        document.getElementById('course-page-content').style.display = 'block';
+                        console.log("Access Granted: User has paid and is verified.");
+                        if (coursePageContent) coursePageContent.style.display = 'block';
                         showCourseSection('unlocked');
-                        buildVideoModules();
-                        
+                        buildVideoModules(); 
+                    
+                    } else if (hasPaid && !isVerified) {
+                        // --- 2. PAID, BUT NOT VERIFIED ---
+                        // Show "Verify Email" page
+                        console.log("Access Denied: User has paid but is NOT verified.");
+                        const verifyEmailAddress = document.getElementById('verify-email-address');
+                        if (verifyEmailAddress) verifyEmailAddress.textContent = user.email;
+                        if (verifyEmailContent) verifyEmailContent.style.display = 'block';
+
                     } else {
-                        // FAILURE: No purchase found
-                        console.log("Access Denied. No purchase record found.");
+                        // --- 3. NOT PAID (Verification status doesn't matter) ---
+                        console.log("Access Denied: No purchase record found.");
                         
                         const currentParams = new URLSearchParams(window.location.search);
                         if (currentParams.get('payment') === 'success') {
                             // User just paid. Stripe webhook is probably just slow.
                             // DO NOTHING. This leaves the loading spinner visible, which is correct.
                             console.log("Payment redirect detected. Waiting for webhook...");
+                            
+                            // Make sure loading spinner is visible
+                            if (coursePageContent) coursePageContent.style.display = 'block';
+                            showCourseSection('loading');
                         } else {
-                            // User is verified, logged in, but has not paid. Show sales page.
-                            document.getElementById('sales-page-content').style.display = 'block';
-                            document.getElementById('course-page-content').style.display = 'none';
+                            // User has not paid. Show sales page.
+                            if (salesPageContent) salesPageContent.style.display = 'block';
                         }
                     }
                 }, err => {
                      console.error("Error listening to purchase doc:", err);
                      document.getElementById('sales-page-content').style.display = 'block';
                      document.getElementById('course-page-content').style.display = 'none';
+                     document.getElementById('verify-email-content').style.display = 'none';
                 });
                 
                 return unsubscribe; // Return the function to stop the listener
@@ -1238,11 +1268,12 @@
                 console.error("Error checking Firestore:", err);
                 document.getElementById('sales-page-content').style.display = 'block';
                 document.getElementById('course-page-content').style.display = 'none';
+                document.getElementById('verify-email-content').style.display = 'none';
                 return () => {}; // Return an empty function
             }
         }
 
-        let firestoreListener = null;
+        let firestoreListener = null; 
 
         if (auth) {
             // --- ALL UI Elements that depend on auth ---
@@ -1314,7 +1345,7 @@
                          authStatus.textContent = '';
                          if(emailInput) emailInput.value = '';
                          if(passwordInput) passwordInput.value = '';
-                    }, 1500);
+                    }, 1500); 
                 } catch (err) {
                     authStatus.textContent = 'Error: ' + err.message;
                 }
@@ -1337,7 +1368,7 @@
 
             if (logoutBtn) logoutBtn.addEventListener('click', async () => {
                 if (firestoreListener) {
-                    firestoreListener();
+                    firestoreListener(); 
                     firestoreListener = null;
                 }
                 await auth.signOut();
@@ -1349,7 +1380,6 @@
                 const salesPageContent = document.getElementById('sales-page-content');
                 const coursePageContent = document.getElementById('course-page-content');
                 const verifyEmailContent = document.getElementById('verify-email-content');
-                const verifyEmailAddress = document.getElementById('verify-email-address');
                 
                 // First, hide everything
                 if (salesPageContent) salesPageContent.style.display = 'none';
@@ -1372,25 +1402,16 @@
                     }
                     allEnrollButtons.forEach(btn => btn.disabled = false);
 
-                    // --- NEW 3-POINT CHECK ---
-                    if (!user.emailVerified) {
-                        // --- 2. USER IS SIGNED IN, BUT EMAIL NOT VERIFIED ---
-                        console.log("User signed in, but email is NOT verified.");
-                        if (verifyEmailAddress) verifyEmailAddress.textContent = user.email;
-                        if (verifyEmailContent) verifyEmailContent.style.display = 'block';
-
-                    } else {
-                        // --- 3. USER IS SIGNED IN AND VERIFIED ---
-                        console.log("User signed in and VERIFIED. Checking for payment...");
-                        
-                        // ALWAYS show the course page container (which has the loading spinner)
-                        if (coursePageContent) coursePageContent.style.display = 'block';
-                        showCourseSection('loading');
-                        
-                        // Now check for payment
-                        if (firestoreListener) firestoreListener();
-                        firestoreListener = await checkUserAccess(user.uid);
-                    }
+                    // --- NEW LOGIC: ---
+                    // ALWAYS show the loading spinner and check access.
+                    // The checkUserAccess function will decide what to show
+                    // (Sales Page, Verify Email, or Course)
+                    console.log("User signed in. Checking access...");
+                    if (coursePageContent) coursePageContent.style.display = 'block';
+                    showCourseSection('loading');
+                    
+                    if (firestoreListener) firestoreListener();
+                    firestoreListener = await checkUserAccess(user, user.uid); // <-- Pass the full user object
                     
                 } else {
                     // --- 4. USER IS SIGNED OUT ---
@@ -1443,7 +1464,7 @@
                     const price = btn.dataset.price;
                     
                     if (auth.currentUser) {
-                        // User is signed in, proceed to payment
+                        // User is signed in, proceed to payment (verification not required to pay)
                         const paymentLink = PAYMENT_LINK_MAP[price];
                         if (paymentLink && (paymentLink.includes('https://') || paymentLink.includes('http://'))) {
                             if(paymentLink.includes('YOUR_LINK')) {
