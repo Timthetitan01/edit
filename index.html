@@ -978,7 +978,7 @@
                     <div class="icon">📧</div>
                     <h2>Please Verify Your Email</h2>
                     <p>
-                        We sent a verification link to 
+                        You're almost in! We sent a verification link to 
                         <strong id="verify-email-address">you@example.com</strong>.
                     </p>
                     <p>
@@ -1189,17 +1189,13 @@
         }
 
         /**
-         * NEW: Checks Firestore for payment AND checks user for verification.
-         * This function now handles all 3 states:
-         * 1. Paid + Verified = Show Course
-         * 2. Paid + Not Verified = Show Verify Email Screen
-         * 3. Not Paid = Show Sales Page (or loading spinner if just paid)
+         * UPDATED: Checks Firestore for payment AND checks user for verification.
+         * This function now controls ALL page content visibility.
          */
-        async function checkUserAccess(user, userId) { // <-- Takes the full user object now
+        async function checkUserAccess(user, userId) {
             if (!db) {
                 console.error("Firestore (db) is not initialized.");
                 document.getElementById('sales-page-content').style.display = 'block';
-                document.getElementById('course-page-content').style.display = 'none';
                 return () => {}; // Return an empty function
             }
             
@@ -1209,13 +1205,15 @@
                 const unsubscribe = purchaseDocRef.onSnapshot(docSnap => {
                     const hasPaid = (docSnap.exists() && docSnap.data().unlocked === true);
                     const isVerified = user.emailVerified;
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const isPaymentRedirect = (urlParams.get('payment') === 'success');
 
                     // Get all page containers
                     const salesPageContent = document.getElementById('sales-page-content');
                     const coursePageContent = document.getElementById('course-page-content');
                     const verifyEmailContent = document.getElementById('verify-email-content');
 
-                    // Hide all first
+                    // Hide all 3 content sections first
                     if (salesPageContent) salesPageContent.style.display = 'none';
                     if (coursePageContent) coursePageContent.style.display = 'none';
                     if (verifyEmailContent) verifyEmailContent.style.display = 'none';
@@ -1237,26 +1235,22 @@
                         if (verifyEmailAddress) verifyEmailAddress.textContent = user.email;
                         if (verifyEmailContent) verifyEmailContent.style.display = 'block';
 
-                    } else {
-                        // --- 3. NOT PAID (Verification status doesn't matter) ---
-                        console.log("Access Denied: No purchase record found.");
+                    } else if (!hasPaid && isPaymentRedirect) {
+                        // --- 3. JUST PAID, WEBHOOK IS SLOW ---
+                        // Show loading spinner
+                        console.log("Payment redirect detected. Waiting for webhook...");
+                        if (coursePageContent) coursePageContent.style.display = 'block';
+                        showCourseSection('loading');
                         
-                        const currentParams = new URLSearchParams(window.location.search);
-                        if (currentParams.get('payment') === 'success') {
-                            // User just paid. Stripe webhook is probably just slow.
-                            // DO NOTHING. This leaves the loading spinner visible, which is correct.
-                            console.log("Payment redirect detected. Waiting for webhook...");
-                            
-                            // Make sure loading spinner is visible
-                            if (coursePageContent) coursePageContent.style.display = 'block';
-                            showCourseSection('loading');
-                        } else {
-                            // User has not paid. Show sales page.
-                            if (salesPageContent) salesPageContent.style.display = 'block';
-                        }
+                    } else {
+                        // --- 4. NOT PAID (and not a payment redirect) ---
+                        // This is the default state for a new (or logged in, non-paying) user
+                        console.log("Access Denied: No purchase record found. Showing sales page.");
+                        if (salesPageContent) salesPageContent.style.display = 'block';
                     }
                 }, err => {
                      console.error("Error listening to purchase doc:", err);
+                     // Fallback: Show sales page on error
                      document.getElementById('sales-page-content').style.display = 'block';
                      document.getElementById('course-page-content').style.display = 'none';
                      document.getElementById('verify-email-content').style.display = 'none';
@@ -1266,6 +1260,7 @@
 
             } catch (err) {
                 console.error("Error checking Firestore:", err);
+                // Fallback: Show sales page on error
                 document.getElementById('sales-page-content').style.display = 'block';
                 document.getElementById('course-page-content').style.display = 'none';
                 document.getElementById('verify-email-content').style.display = 'none';
@@ -1277,7 +1272,6 @@
 
         if (auth) {
             // --- ALL UI Elements that depend on auth ---
-            // Moved all element definitions INSIDE the if(auth) block
             const loginBtn = document.getElementById('login-btn');
             const logoutBtn = document.getElementById('logout-btn');
             const userDisplayName = document.getElementById('user-display-name');
@@ -1381,20 +1375,21 @@
                 const coursePageContent = document.getElementById('course-page-content');
                 const verifyEmailContent = document.getElementById('verify-email-content');
                 
-                // First, hide everything
+                // Hide all content pages initially
                 if (salesPageContent) salesPageContent.style.display = 'none';
                 if (coursePageContent) coursePageContent.style.display = 'none';
                 if (verifyEmailContent) verifyEmailContent.style.display = 'none';
 
                 if (user) {
                     // --- 1. USER IS SIGNED IN ---
+                    console.log("User signed in. Setting up nav.");
                     const name = user.displayName || user.email.split('@')[0];
                     if (userDisplayName) userDisplayName.textContent = `Welcome, ${name}`;
                     if (userDisplayName) userDisplayName.style.display = 'inline';
                     if (loginBtn) loginBtn.style.display = 'none';
                     if (logoutBtn) logoutBtn.style.display = 'inline-block';
 
-                    // Update payment links (in case they need to buy)
+                    // Update payment links
                     const userId = user.uid;
                     for (const key in BASE_PAYMENT_LINKS) {
                         const baseUrl = BASE_PAYMENT_LINKS[key];
@@ -1402,16 +1397,19 @@
                     }
                     allEnrollButtons.forEach(btn => btn.disabled = false);
 
-                    // --- NEW LOGIC: ---
-                    // ALWAYS show the loading spinner and check access.
-                    // The checkUserAccess function will decide what to show
-                    // (Sales Page, Verify Email, or Course)
-                    console.log("User signed in. Checking access...");
-                    if (coursePageContent) coursePageContent.style.display = 'block';
-                    showCourseSection('loading');
+                    // --- NEW LOGIC: Check URL for payment success ---
+                    // We only show the loading spinner IF they just paid.
+                    const urlParams = new URLSearchParams(window.location.search);
+                    if (urlParams.get('payment') === 'success') {
+                        console.log("Payment success redirect detected. Showing loading spinner.");
+                        if (coursePageContent) coursePageContent.style.display = 'block';
+                        showCourseSection('loading');
+                    }
                     
+                    // Now, let the access checker decide which page to show
+                    // (Course, Verify Email, or Sales Page)
                     if (firestoreListener) firestoreListener();
-                    firestoreListener = await checkUserAccess(user, user.uid); // <-- Pass the full user object
+                    firestoreListener = await checkUserAccess(user, user.uid);
                     
                 } else {
                     // --- 4. USER IS SIGNED OUT ---
@@ -1466,7 +1464,7 @@
                     if (auth.currentUser) {
                         // User is signed in, proceed to payment (verification not required to pay)
                         const paymentLink = PAYMENT_LINK_MAP[price];
-                        if (paymentLink && (paymentLink.includes('https://') || paymentLink.includes('http://'))) {
+                        if (paymentLink && (paymentLink.includes('https') || paymentLink.includes('http://'))) {
                             if(paymentLink.includes('YOUR_LINK')) {
                                 console.error(`Placeholder link for price '${price}'. Please update 'PAYMENT_LINK_MAP' in your code.`);
                             } else {
