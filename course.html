@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Course</title>
+    
+    <style>
+        :root {
+            --bg-dark: #0a0f1a;
+            --text-light: #e0e8ff;
+            --text-medium: #a0aec0;
+            --font-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        body {
+            font-family: var(--font-system);
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            line-height: 1.6;
+            padding: 2rem;
+            margin: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1 { font-size: 2.5rem; }
+        p { color: var(--text-medium); }
+        a { color: #3a86ff; }
+
+        /* Hide content by default */
+        #loading-content, #course-content {
+            display: none;
+            text-align: center;
+            padding-top: 10vh;
+        }
+        #course-content {
+            text-align: left;
+        }
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 8px;
+            background: #000;
+        }
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    
+</head>
+<body>
+
+    <div id="loading-content">
+        <div class="container">
+            <h1>Verifying Access...</h1>
+            <p>Please wait while we check your account.</p>
+        </div>
+    </div>
+
+    <div id="course-content">
+        <div class="container">
+            <h1>Welcome to the Course!</h1>
+            <p>This is your secure course content. Only paid members can see this.</p>
+            <br>
+            
+            <div class="video-wrapper">
+                <iframe 
+                    src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+            <br>
+            <p><a href="/">Back to Home</a></p>
+        </div>
+    </div>
+
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // <<< YOUR FIREBASE CONFIG (Copied from your index.html) >>>
+        const FIREBASE_CONFIG = {
+          apiKey: "AIzaSyB4qMlzlV0FHsgwGyKBYOJETvjD_i5Nmis",
+          authDomain: "editing-1750c.firebaseapp.com",
+          projectId: "editing-1750c",
+          storageBucket: "editing-1750c.appspot.com",
+          messagingSenderId: "316187910712",
+          appId: "1:316187910712:web:e0be47dbd6e5af30d2fccd",
+          measurementId: "G-78BQD5FHYF"
+        };
+        
+        // <<< YOUR HOME PAGE URL (The "pretty" root URL) >>>
+        const HOME_PAGE_URL = "/";
+
+        // Initialize Firebase
+        let auth;
+        let db;
+        try {
+            firebase.initializeApp(FIREBASE_CONFIG);
+            auth = firebase.auth();
+            db = firebase.firestore();
+            console.log("Firebase Initialized Successfully!");
+        } catch (e) {
+            console.error("Firebase initialization error", e);
+        }
+
+        const loadingContent = document.getElementById('loading-content');
+        const courseContent = document.getElementById('course-content');
+        
+        // Show loading spinner
+        loadingContent.style.display = 'block';
+
+        if (auth) {
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // 1. User is signed in, check for payment
+                    console.log("User signed in, checking payment...");
+                    const purchaseDocRef = db.doc(`users/${user.uid}/purchases/main-course`);
+
+                    purchaseDocRef.onSnapshot((docSnap) => {
+                        // This is the v8/v9 bug fix (no parentheses on .exists)
+                        const hasPaid = (docSnap.exists && docSnap.data() && docSnap.data().unlocked === true);
+
+                        if (hasPaid) {
+                            // SUCCESS! Show the course
+                            console.log("Access Granted. Showing course.");
+                            loadingContent.style.display = 'none';
+                            courseContent.style.display = 'block';
+                        } else {
+                            // User is logged in but hasn't paid. Kick them out.
+                            console.log("Access Denied: No purchase record. Redirecting home.");
+                            window.location.href = HOME_PAGE_URL;
+                        }
+                    }, (err) => {
+                        console.error("Error checking Firestore:", err);
+                        alert("Error checking your account. Please try again.");
+                        window.location.href = HOME_PAGE_URL;
+                    });
+                } else {
+                    // 2. User is not signed in. Kick them out.
+                    console.log("User not signed in. Redirecting home.");
+                    window.location.href = HOME_PAGE_URL;
+                }
+            });
+        }
+
+    });
+    </script>
+    
+</body>
+</html>
