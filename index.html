@@ -1000,7 +1000,7 @@
                 const purchaseDocRef = db.doc(`users/${userId}/purchases/main-course`);
                 
                 const unsubscribe = purchaseDocRef.onSnapshot(docSnap => {
-                    const hasPaid = (docSnap.exists() && docSnap.data().unlocked === true);
+                    const hasPaid = (docSnap.exists && docSnap.data().unlocked === true);
 
                     // Get all page containers
                     const salesPageContent = document.getElementById('sales-page-content');
@@ -1045,7 +1045,7 @@
             }
         }
 
-        let firestoreListener = null; 
+        let firestoreListener = null;
         
         // NEW: Variable to remember what user clicked
         let pendingPurchasePrice = null;
@@ -1151,7 +1151,7 @@
 
             if (logoutBtn) logoutBtn.addEventListener('click', async () => {
                 if (firestoreListener) {
-                    firestoreListener(); 
+                    firestoreListener();
                     firestoreListener = null;
                 }
                 await auth.signOut();
@@ -1181,7 +1181,7 @@
                     for (const key in BASE_PAYMENT_LINKS) {
                         const baseUrl = BASE_PAYMENT_LINKS[key];
                         // This map is now just for reference, we build the link on the fly
-                        PAYMENT_LINK_MAP[key] = `${baseUrl}?client_reference_id=${userId}`; 
+                        PAYMENT_LINK_MAP[key] = `${baseUrl}?client_reference_id=${userId}`;
                     }
                     allEnrollButtons.forEach(btn => btn.disabled = false);
 
@@ -1244,7 +1244,7 @@
                         // User is NOT signed in, show the modal
                         console.log("User not signed in. Showing auth modal.");
                         // NEW: Set the pending purchase price
-                        pendingPurchasePrice = price; 
+                        pendingPurchasePrice = price;
                         showModal(authModal);
                     }
                 });
@@ -1282,6 +1282,8 @@
 
     }); // End DOMContentLoaded
     </script>
+    
+    
     
 </body>
 </html>
