@@ -202,7 +202,7 @@
                     <!-- The first video will load here by default -->
                     <iframe 
                         id="video-player"
-                        src="https://www.youtube.com/embed/sgNPozHPv04" 
+                        src="https://www.youtube.com/embed/sgNPozHPv04?rel=0&modestbranding=1" 
                         frameborder="0" 
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                         allowfullscreen>
@@ -376,7 +376,7 @@
                     lessonDescription.textContent = newDesc;
                 }
                 if (newVideoID && videoPlayer) {
-                    videoPlayer.src = `https://www.youtube.com/embed/${newVideoID}`;
+                    videoPlayer.src = `https://www.youtube.com/embed/${newVideoID}?rel=0&modestbranding=1`;
                 }
             });
         });
