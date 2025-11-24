@@ -85,13 +85,12 @@
         }
 
         /* --- 2-Column Layout --- */
-        .course-layout {
-            display: flex;
-        }
+        /* Removing 2-column layout */
 
-        /* --- Main Content (Left Column) --- */
+        /* --- Main Content (Full Width) --- */
         .main-content {
-            flex: 3; /* Takes up 3/4 of the space */
+            max-width: 900px;
+            margin: 0 auto; /* Center the content */
             padding: 2rem;
         }
 
@@ -112,60 +111,32 @@
             height: 100%;
         }
 
-        /* --- Sidebar (Right Column) --- */
-        .sidebar {
-            flex: 1; /* Takes up 1/4 of the space */
+        /* --- Lesson Slot --- */
+        .lesson-slot {
             background-color: var(--bg-medium);
-            padding: 2rem;
-            min-height: 100vh;
-            border-left: 1px solid var(--bg-light-hover);
+            border: 1px solid var(--bg-light-hover);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
         }
-
-        .sidebar-nav ul {
-            list-style: none;
-        }
-        .sidebar-nav .module {
-            margin-bottom: 1.5rem;
-        }
-        .sidebar-nav .module h3 {
-            font-size: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-medium);
-            border-bottom: 1px solid var(--bg-light-hover);
-            padding-bottom: 0.5rem;
-        }
-        .sidebar-nav .module ul {
-            margin-top: 0.75rem;
-        }
-        .sidebar-nav a {
-            display: block;
-            color: var(--text-medium);
-            padding: 0.75rem;
-            border-radius: 5px;
-            transition: background-color 0.2s, color 0.2s;
-        }
-        .sidebar-nav a:hover {
-            background-color: var(--bg-light-hover);
+        .lesson-slot h2 {
+            font-size: 1.5rem;
             color: var(--text-light);
         }
-        .sidebar-nav a.active {
-            background-color: var(--blue-accent);
-            color: #fff;
-            font-weight: 600;
+        .lesson-slot p {
+            color: var(--text-medium);
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
         }
+
+
+        /* --- Sidebar (Right Column) --- */
+        /* Removing sidebar styles */
+
 
         /* --- Responsive Design --- */
         @media (max-width: 900px) {
-            .course-layout {
-                flex-direction: column; /* Stack columns on mobile */
-            }
-            .sidebar {
-                order: -1; /* Move sidebar to the top */
-                min-height: auto;
-                border-left: none;
-                border-bottom: 1px solid var(--bg-light-hover);
-            }
+            /* Removing 2-column responsive rules */
             .course-header {
                 padding: 1rem;
             }
@@ -194,41 +165,88 @@
 
         <div class="course-layout">
             
-            <!-- Main Content (Video) -->
+            <!-- Main Content (Video List) -->
             <main class="main-content">
-                <h2 id="lesson-title">Welcome to the Course!</h2>
                 
-                <div class="video-wrapper">
-                    <!-- Replace this with your YouTube/Vimeo embed link -->
-                    <iframe 
-                        id="video-player"
-                        src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
-                        frameborder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen>
-                    </iframe>
+                <!-- Lesson 1 Slot -->
+                <div class="lesson-slot">
+                    <h2>Lesson 1: Welcome!</h2>
+                    <p>This is the description for the first lesson. Replace the video ID below.</p>
+                    <div class="video-wrapper">
+                        <!-- 
+                          HOW TO USE THIS:
+                          Find your YouTube video's ID (the part after "v=" in the URL)
+                          and paste it after "embed/" below.
+                        -->
+                        <iframe 
+                            src="https://www.youtube.com/embed/VIDEO_ID_1" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
                 </div>
-                
-                <p style="margin-top: 1rem;">This is the description for the first lesson.</p>
+
+                <!-- Lesson 2 Slot -->
+                <div class="lesson-slot">
+                    <h2>Lesson 2: The Basics</h2>
+                    <p>This is the description for the second lesson.</p>
+                    <div class="video-wrapper">
+                        <iframe 
+                            src="https://www.youtube.com/embed/VIDEO_ID_2" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+
+                <!-- Lesson 3 Slot -->
+                <div class="lesson-slot">
+                    <h2>Lesson 3: Core Concepts</h2>
+                    <p>This is the description for the third lesson.</p>
+                    <div class="video-wrapper">
+                        <iframe 
+                            src="https.youtube.com/embed/VIDEO_ID_3" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+
+                <!-- Lesson 4 Slot -->
+                <div class="lesson-slot">
+                    <h2>Lesson 4: Advanced Tips</h2>
+                    <p>This is the description for the fourth lesson.</p>
+                    <div class="video-wrapper">
+                        <iframe 
+                            src="https.youtube.com/embed/VIDEO_ID_4" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+
+                <!-- Lesson 5 Slot -->
+                <div class="lesson-slot">
+                    <h2>Lesson 5: Final Project</h2>
+                    <p>This is the description for the fifth lesson.</p>
+                    <div class="video-wrapper">
+                        <iframe 
+                            src="https.youtube.com/embed/VIDEO_ID_5" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+
             </main>
 
             <!-- Sidebar (Navigation) -->
-            <aside class="sidebar">
-                <nav class="sidebar-nav">
-                    <ul>
-                        <li class="module">
-                            <h3>Course Lessons</h3>
-                            <ul>
-                                <li><a href="#" class="active" data-video="dQw4w9WgXcQ" data-title="Lesson 1: Welcome!">1. Welcome</a></li>
-                                <li><a href="#" data-video="v=..._YOUR_ID_..." data-title="Lesson 2: The Basics">2. The Basics</a></li>
-                                <li><a href="#" data-video="v=..._YOUR_ID_..." data-title="Lesson 3: Core Concepts">3. Core Concepts</a></li>
-                                <li><a href="#" data-video="v=..._YOUR_ID_..." data-title="Lesson 4: Advanced Tips">4. Advanced Tips</a></li>
-                                <li><a href="#" data-video="v=..._YOUR_ID_..." data-title="Lesson 5: Final Project">5. Final Project</a></li>
-                            </ul>
-                        </li>
-                    </ul>
-                </nav>
-            </aside>
+            <!-- Removing sidebar -->
 
         </div>
     </div>
@@ -324,32 +342,7 @@
         }
 
         // Sidebar Navigation (Mock)
-        const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
-        const lessonTitle = document.getElementById('lesson-title');
-        const videoPlayer = document.getElementById('video-player');
-
-        sidebarLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault(); // Stop it from navigating
-
-                // Remove 'active' class from all links
-                sidebarLinks.forEach(l => l.classList.remove('active'));
-                
-                // Add 'active' class to the one clicked
-                e.target.classList.add('active'); 
-                
-                // --- In a real app, you'd change the video src and title ---
-                const newTitle = e.target.getAttribute('data-title');
-                const newVideoID = e.target.getAttribute('data-video');
-                
-                if (newTitle) {
-                    lessonTitle.textContent = newTitle;
-                }
-                if (newVideoID && videoPlayer) {
-                    videoPlayer.src = `https://www.youtube.com/embed/${newVideoID}`;
-                }
-            });
-        });
+        /* Removing sidebar JavaScript */
 
     });
     </script>
