@@ -5,38 +5,96 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Course</title>
     
+    <!-- Firebase (compat) SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
     <style>
+        /* --- Root Variables (Your Theme) --- */
         :root {
             --bg-dark: #0a0f1a;
+            --bg-medium: #1a202c; /* For sidebar */
+            --bg-light-hover: #2d3748;
             --text-light: #e0e8ff;
             --text-medium: #a0aec0;
+            --blue-accent: #3a86ff;
             --font-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
+
+        /* --- Basic Reset --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: var(--font-system);
             background-color: var(--bg-dark);
             color: var(--text-light);
             line-height: 1.6;
-            padding: 2rem;
             margin: 0;
         }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        h1 { font-size: 2.5rem; }
-        p { color: var(--text-medium); }
-        a { color: #3a86ff; }
 
-        /* Hide content by default */
-        #loading-content, #course-content {
+        h1, h2, h3 {
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+        }
+        h1 { font-size: 2rem; }
+        h2 { font-size: 1.75rem; }
+        h3 { font-size: 1.1rem; }
+        p { color: var(--text-medium); }
+        a { color: var(--blue-accent); text-decoration: none; }
+
+        /* --- Loading State (Hidden by default) --- */
+        #loading-content {
             display: none;
             text-align: center;
-            padding-top: 10vh;
+            padding-top: 20vh;
         }
+
+        /* --- Course Content (Hidden by default) --- */
         #course-content {
-            text-align: left;
+            display: none;
         }
+
+        /* --- Header --- */
+        .course-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: var(--bg-medium);
+            border-bottom: 1px solid var(--bg-light-hover);
+        }
+
+        .sign-out-btn {
+            font-family: var(--font-system);
+            font-weight: 600;
+            background-color: var(--blue-accent);
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .sign-out-btn:hover {
+            background-color: #2a75ff;
+        }
+
+        /* --- 2-Column Layout --- */
+        .course-layout {
+            display: flex;
+        }
+
+        /* --- Main Content (Left Column) --- */
+        .main-content {
+            flex: 3; /* Takes up 3/4 of the space */
+            padding: 2rem;
+        }
+
         .video-wrapper {
             position: relative;
             padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
@@ -44,6 +102,7 @@
             overflow: hidden;
             border-radius: 8px;
             background: #000;
+            margin-top: 1rem;
         }
         .video-wrapper iframe {
             position: absolute;
@@ -52,38 +111,125 @@
             width: 100%;
             height: 100%;
         }
-    </style>
 
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    
+        /* --- Sidebar (Right Column) --- */
+        .sidebar {
+            flex: 1; /* Takes up 1/4 of the space */
+            background-color: var(--bg-medium);
+            padding: 2rem;
+            min-height: 100vh;
+            border-left: 1px solid var(--bg-light-hover);
+        }
+
+        .sidebar-nav ul {
+            list-style: none;
+        }
+        .sidebar-nav .module {
+            margin-bottom: 1.5rem;
+        }
+        .sidebar-nav .module h3 {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-medium);
+            border-bottom: 1px solid var(--bg-light-hover);
+            padding-bottom: 0.5rem;
+        }
+        .sidebar-nav .module ul {
+            margin-top: 0.75rem;
+        }
+        .sidebar-nav a {
+            display: block;
+            color: var(--text-medium);
+            padding: 0.75rem;
+            border-radius: 5px;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .sidebar-nav a:hover {
+            background-color: var(--bg-light-hover);
+            color: var(--text-light);
+        }
+        .sidebar-nav a.active {
+            background-color: var(--blue-accent);
+            color: #fff;
+            font-weight: 600;
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 900px) {
+            .course-layout {
+                flex-direction: column; /* Stack columns on mobile */
+            }
+            .sidebar {
+                order: -1; /* Move sidebar to the top */
+                min-height: auto;
+                border-left: none;
+                border-bottom: 1px solid var(--bg-light-hover);
+            }
+            .course-header {
+                padding: 1rem;
+            }
+            .main-content {
+                padding: 1.5rem;
+            }
+        }
+
+    </style>
 </head>
 <body>
 
+    <!-- 1. LOADING STATE (Shown first) -->
     <div id="loading-content">
-        <div class="container">
-            <h1>Verifying Access...</h1>
-            <p>Please wait while we check your account.</p>
-        </div>
+        <h1>Verifying Access...</h1>
+        <p>Please wait while we check your account.</p>
     </div>
 
+    <!-- 2. COURSE CONTENT (Shown on success) -->
     <div id="course-content">
-        <div class="container">
-            <h1>Welcome to the Course!</h1>
-            <p>This is your secure course content. Only paid members can see this.</p>
-            <br>
+
+        <header class="course-header">
+            <h1>My Course</h1>
+            <button id="sign-out-btn" class="sign-out-btn">Sign Out</button>
+        </header>
+
+        <div class="course-layout">
             
-            <div class="video-wrapper">
-                <iframe 
-                    src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
-                    frameborder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowfullscreen>
-                </iframe>
-            </div>
-            <br>
-            <p><a href="/">Back to Home</a></p>
+            <!-- Main Content (Video) -->
+            <main class="main-content">
+                <h2 id="lesson-title">Welcome to the Course!</h2>
+                
+                <div class="video-wrapper">
+                    <!-- Replace this with your YouTube/Vimeo embed link -->
+                    <iframe 
+                        id="video-player"
+                        src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
+                </div>
+                
+                <p style="margin-top: 1rem;">This is the description for the first lesson.</p>
+            </main>
+
+            <!-- Sidebar (Navigation) -->
+            <aside class="sidebar">
+                <nav class="sidebar-nav">
+                    <ul>
+                        <li class="module">
+                            <h3>Course Lessons</h3>
+                            <ul>
+                                <li><a href="#" class="active" data-video="dQw4w9WgXcQ" data-title="Lesson 1: Welcome!">1. Welcome</a></li>
+                                <li><a href="#" data-video="v=..._YOUR_ID_..." data-title="Lesson 2: The Basics">2. The Basics</a></li>
+                                <li><a href="#" data-video="v=..._YOUR_ID_..." data-title="Lesson 3: Core Concepts">3. Core Concepts</a></li>
+                                <li><a href="#" data-video="v=..._YOUR_ID_..." data-title="Lesson 4: Advanced Tips">4. Advanced Tips</a></li>
+                                <li><a href="#" data-video="v=..._YOUR_ID_..." data-title="Lesson 5: Final Project">5. Final Project</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+            </aside>
+
         </div>
     </div>
 
@@ -123,39 +269,87 @@
         // Show loading spinner
         loadingContent.style.display = 'block';
 
-        if (auth) {
-            auth.onAuthStateChanged((user) => {
-                if (user) {
-                    // 1. User is signed in, check for payment
-                    console.log("User signed in, checking payment...");
-                    const purchaseDocRef = db.doc(`users/${user.uid}/purchases/main-course`);
+        if (!auth) {
+            console.error("Auth is not initialized.");
+            loadingContent.innerHTML = "<h1>Error initializing. Please refresh.</h1>";
+            return;
+        }
 
-                    purchaseDocRef.onSnapshot((docSnap) => {
-                        // This is the v8/v9 bug fix (no parentheses on .exists)
-                        const hasPaid = (docSnap.exists && docSnap.data() && docSnap.data().unlocked === true);
+        // --- Security Script ---
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // 1. User is signed in, check for payment
+                console.log("User signed in, checking payment...");
+                const purchaseDocRef = db.doc(`users/${user.uid}/purchases/main-course`);
 
-                        if (hasPaid) {
-                            // SUCCESS! Show the course
-                            console.log("Access Granted. Showing course.");
-                            loadingContent.style.display = 'none';
-                            courseContent.style.display = 'block';
-                        } else {
-                            // User is logged in but hasn't paid. Kick them out.
-                            console.log("Access Denied: No purchase record. Redirecting home.");
-                            window.location.href = HOME_PAGE_URL;
-                        }
-                    }, (err) => {
-                        console.error("Error checking Firestore:", err);
-                        alert("Error checking your account. Please try again.");
+                purchaseDocRef.onSnapshot((docSnap) => {
+                    // This is the v8/v9 bug fix (no parentheses on .exists)
+                    const hasPaid = (docSnap.exists && docSnap.data() && docSnap.data().unlocked === true);
+
+                    if (hasPaid) {
+                        // SUCCESS! Show the course
+                        console.log("Access Granted. Showing course.");
+                        loadingContent.style.display = 'none';
+                        courseContent.style.display = 'block';
+                    } else {
+                        // User is logged in but hasn't paid. Kick them out.
+                        console.log("Access Denied: No purchase record. Redirecting home.");
                         window.location.href = HOME_PAGE_URL;
-                    });
-                } else {
-                    // 2. User is not signed in. Kick them out.
-                    console.log("User not signed in. Redirecting home.");
+                    }
+                }, (err) => {
+                    console.error("Error checking Firestore:", err);
+                    alert("Error checking your account. Please try again.");
                     window.location.href = HOME_PAGE_URL;
-                }
+                });
+            } else {
+                // 2. User is not signed in. Kick them out.
+                console.log("User not signed in. Redirecting home.");
+                window.location.href = HOME_PAGE_URL;
+            }
+        });
+
+        // --- Page Functionality ---
+        
+        // Sign Out Button
+        const signOutButton = document.getElementById('sign-out-btn');
+        if (signOutButton) {
+            signOutButton.addEventListener('click', () => {
+                auth.signOut().then(() => {
+                    console.log("User signed out.");
+                    window.location.href = HOME_PAGE_URL;
+                }).catch((error) => {
+                    console.error("Sign out error", error);
+                });
             });
         }
+
+        // Sidebar Navigation (Mock)
+        const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+        const lessonTitle = document.getElementById('lesson-title');
+        const videoPlayer = document.getElementById('video-player');
+
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault(); // Stop it from navigating
+
+                // Remove 'active' class from all links
+                sidebarLinks.forEach(l => l.classList.remove('active'));
+                
+                // Add 'active' class to the one clicked
+                e.target.classList.add('active'); 
+                
+                // --- In a real app, you'd change the video src and title ---
+                const newTitle = e.target.getAttribute('data-title');
+                const newVideoID = e.target.getAttribute('data-video');
+                
+                if (newTitle) {
+                    lessonTitle.textContent = newTitle;
+                }
+                if (newVideoID && videoPlayer) {
+                    videoPlayer.src = `https://www.youtube.com/embed/${newVideoID}`;
+                }
+            });
+        });
 
     });
     </script>
