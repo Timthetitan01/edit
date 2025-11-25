@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Course</title>
     
-    <!-- Firebase (compat) SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -178,13 +177,11 @@
 </head>
 <body>
 
-    <!-- 1. LOADING STATE (Shown first) -->
     <div id="loading-content">
         <h1>Verifying Access...</h1>
         <p>Please wait while we check your account.</p>
     </div>
 
-    <!-- 2. COURSE CONTENT (Shown on success) -->
     <div id="course-content">
 
         <header class="course-header">
@@ -194,17 +191,15 @@
 
         <div class="course-layout">
             
-            <!-- Main Content (Video) -->
             <main class="main-content">
                 <h2 id="lesson-title">Lesson 1: Welcome!</h2>
                 
                 <div class="video-wrapper">
-                    <!-- The first video will load here by default -->
-                    <iframe 
+                    <iframe
                         id="video-player"
-                        src="https://www.youtube.com/embed/sgNPozHPv04?rel=0&modestbranding=1" 
-                        frameborder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        src="https://www.youtube.com/embed/sgNPozHPv04?rel=0&modestbranding=1"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowfullscreen>
                     </iframe>
                 </div>
@@ -212,41 +207,36 @@
                 <p id="lesson-description" style="margin-top: 1rem;">This is the description for the first lesson.</p>
             </main>
 
-            <!-- Sidebar (Navigation) -->
             <aside class="sidebar">
                 <nav class="sidebar-nav">
                     <ul>
                         <li class="module">
                             <h3>Course Lessons</h3>
                             <ul>
-                                <!-- 
-                                  LINKS UPDATED WITH YOUR VIDEO IDS
-                                  The data-video attribute holds the YouTube ID.
-                                -->
-                                <li><a href="CourseItems.zip" download>Download Course Items</a></li>
+                                <li><a href="https://raw.githubusercontent.com/Timthetitan01/edit/00d9290dd2dd845495f41807ab577b799e2ae8d1/CourseItems.zip" download>Download Course Items</a></li>
                         
-                                <li><a href="#" class="active" 
-                                       data-video="sgNPozHPv04" 
+                                <li><a href="#" class="active"
+                                       data-video="sgNPozHPv04"
                                        data-title="Lesson 1: Getting Premiere!"
                                        data-desc="Learn what to choose, and how to dowload, and even import your first project footage">1. Welcome</a></li>
                                        
-                                <li><a href="#" 
-                                       data-video="ddL4HxGZdvk" 
+                                <li><a href="#"
+                                       data-video="ddL4HxGZdvk"
                                        data-title="Lesson 2: Learning the UI"
                                        data-desc="Learn Premiere UI tricks">2. The Basics</a></li>
                                        
-                                <li><a href="#" 
-                                       data-video="WEMVN43kVm4" 
+                                <li><a href="#"
+                                       data-video="WEMVN43kVm4"
                                        data-title="Lesson 3: Actually Editing"
                                        data-desc="Learn the core concepts of editing">3. Core Concepts</a></li>
                                        
-                                <li><a href="#" 
-                                       data-video="Ht9yObJDzuU" 
+                                <li><a href="#"
+                                       data-video="Ht9yObJDzuU"
                                        data-title="Lesson 4: The Community"
                                        data-desc="Learn about the editing community and how to use that to your advantage">4. Advanced Tips</a></li>
                                        
-                                <li><a href="#" 
-                                       data-video="03w-eJm02Wc" 
+                                <li><a href="#"
+                                       data-video="03w-eJm02Wc"
                                        data-title="Lesson 5: Portfolio and Getting a Job"
                                        data-desc="Learning how to make a clean portfolio, all the way to getting your first client and make money!!!">5. Final Project</a></li>
                             </ul>
@@ -350,7 +340,10 @@
         }
 
         // Sidebar Navigation
-        const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+        
+        // === FIX 2: Selector only targets links WITH a 'data-video' attribute ===
+        const sidebarLinks = document.querySelectorAll('.sidebar-nav a[data-video]');
+        
         const lessonTitle = document.getElementById('lesson-title');
         const lessonDescription = document.getElementById('lesson-description');
         const videoPlayer = document.getElementById('video-player');
@@ -364,7 +357,7 @@
                 
                 // Add 'active' class to the one clicked
                 const clickedLink = e.currentTarget;
-                clickedLink.classList.add('active'); 
+                clickedLink.classList.add('active');
                 
                 // Get the new content from data attributes
                 const newTitle = clickedLink.getAttribute('data-title');
