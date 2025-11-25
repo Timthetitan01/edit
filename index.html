@@ -667,6 +667,20 @@
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
+        
+        .price-wrapper {
+            display: flex;
+            align-items: center; /* Vertically center the prices */
+            justify-content: center; /* Horizontally center */
+            gap: 0.75rem; /* Space between old and new price */
+        }
+
+        .price-original {
+            font-size: 1.75rem; /* Make it noticeably smaller */
+            font-weight: 400;
+            color: var(--text-medium); /* Use the muted text color */
+            text-decoration: line-through; /* This crosses it out */
+        }
 
     </style>
 
@@ -741,11 +755,13 @@
                         <p>Start learning immediately. All plans include lifetime access.</p>
                     </div>
                     <div class="pricing-grid">
-                        <div class="price-card recommended">
+                     <div class="price-card recommended">
                             <div class="price-card-header">
                                 <h3>Quick-Start Kit</h3>
-                                <div class="price">$5</div>
-                            </div>
+                                <div class="price-wrapper">
+                                    <span class="price-original">$25</span>
+                                    <span class="price">$5</span></div>
+                                </div>
                             <ul class="price-card-features">
                                 <li>Core Editing Fundamentals</li>
                                 <li>Project Files</li>
@@ -759,8 +775,10 @@
                         <div class="price-card">
                             <div class="price-card-header">
                                 <h3>Gaming Specific</h3>
-                                <div class="price">$12</div>
-                            </div>
+                                 <div class="price-wrapper">
+                                    <span class="price-original">$50</span>
+                                    <span class="price">$12</span></div>
+                                </div>
                             <ul class="price-card-features">
                                 <li>Gaming Editing Basics</li>
                                 <li>Discord Community</li>
