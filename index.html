@@ -181,13 +181,14 @@
             /* UPDATED shadow color to match orange accent */
             box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
         }
-        .cta-primary:hover:not(:disabled), .cta-primary:focus-visible:not(:disabled) {
-            background-color: var(--accent-blue-hover);
-            transform: translateY(-3px);
-            /* UPDATED shadow color to match orange accent */
-            box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
-            text-decoration: none;
-        }
+     .cta-primary:hover:not(:disabled), .cta-primary:focus-visible:not(:disabled) {
+    background-color: var(--accent-blue-hover);
+    transform: translateY(-3px);
+    /* UPDATED shadow color to match orange accent */
+    box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
+    text-decoration: none;
+    color: #ffffff; /* <-- ADD THIS LINE to keep text white on hover */
+}
 
         .cta-secondary {
             background-color: transparent;
