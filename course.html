@@ -11,14 +11,15 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
     <style>
-        /* --- Root Variables (Your Theme) --- */
+        /* --- Root Variables (UPDATED to Premium Tech Theme) --- */
         :root {
-            --bg-dark: #0a0f1a;
-            --bg-medium: #1a202c; /* For sidebar */
-            --bg-light-hover: #2d3748;
-            --text-light: #e0e8ff;
-            --text-medium: #a0aec0;
-            --blue-accent: #3a86ff;
+            --bg-dark: #0F172A;          /* Main Background */
+            --bg-medium: #1E293B;       /* For sidebar & header */
+            --bg-light-hover: #334155;  /* For borders & hovers */
+            --text-light: #F8FAFC;      /* Headings, active text */
+            --text-medium: #94A3B8;     /* Body text, inactive links */
+            --blue-accent: #F97316;     /* Main Accent (Orange) */
+            --blue-accent-hover: #EA580C; /* Accent Hover (Darker Orange) */
             --font-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
@@ -81,7 +82,7 @@
             transition: background-color 0.2s;
         }
         .sign-out-btn:hover {
-            background-color: #2a75ff;
+            background-color: var(--blue-accent-hover); /* UPDATED */
         }
 
         /* --- 2-Column Layout --- */
@@ -217,29 +218,29 @@
                                 <li><a href="https://raw.githubusercontent.com/Timthetitan01/edit/00d9290dd2dd845495f41807ab577b799e2ae8d1/CourseItems.zip" download>0. Download Course Items</a></li>
                         
                                 <li><a href="#" class="active"
-                                       data-video="sgNPozHPv04"
-                                       data-title="Lesson 1: Getting Premiere!"
-                                       data-desc="Learn what to choose, and how to dowload, and even import your first project footage">1. Welcome</a></li>
-                                       
+                                        data-video="sgNPozHPv04"
+                                        data-title="Lesson 1: Getting Premiere!"
+                                        data-desc="Learn what to choose, and how to dowload, and even import your first project footage">1. Welcome</a></li>
+                                        
                                 <li><a href="#"
-                                       data-video="ddL4HxGZdvk"
-                                       data-title="Lesson 2: Learning the UI"
-                                       data-desc="Learn Premiere UI tricks">2. The Basics</a></li>
-                                       
+                                        data-video="ddL4HxGZdvk"
+                                        data-title="Lesson 2: Learning the UI"
+                                        data-desc="Learn Premiere UI tricks">2. The Basics</a></li>
+                                        
                                 <li><a href="#"
-                                       data-video="WEMVN43kVm4"
-                                       data-title="Lesson 3: Actually Editing"
-                                       data-desc="Learn the core concepts of editing">3. Core Concepts</a></li>
-                                       
+                                        data-video="WEMVN43kVm4"
+                                        data-title="Lesson 3: Actually Editing"
+                                        data-desc="Learn the core concepts of editing">3. Core Concepts</a></li>
+                                        
                                 <li><a href="#"
-                                       data-video="Ht9yObJDzuU"
-                                       data-title="Lesson 4: The Community"
-                                       data-desc="Learn about the editing community and how to use that to your advantage">4. Advanced Tips</a></li>
-                                       
+                                        data-video="Ht9yObJDzuU"
+                                        data-title="Lesson 4: The Community"
+                                        data-desc="Learn about the editing community and how to use that to your advantage">4. Advanced Tips</a></li>
+                                        
                                 <li><a href="#"
-                                       data-video="03w-eJm02Wc"
-                                       data-title="Lesson 5: Portfolio and Getting a Job"
-                                       data-desc="Learning how to make a clean portfolio, all the way to getting your first client and make money!!!">5. Final Project</a></li>
+                                        data-video="03w-eJm02Wc"
+                                        data-title="Lesson 5: Portfolio and Getting a Job"
+                                        data-desc="Learning how to make a clean portfolio, all the way to getting your first client and make money!!!">5. Final Project</a></li>
                             </ul>
                         </li>
                     </ul>
@@ -255,13 +256,13 @@
 
         // <<< YOUR FIREBASE CONFIG (Copied from your index.html) >>>
         const FIREBASE_CONFIG = {
-          apiKey: "AIzaSyB4qMlzlV0FHsgwGyKBYOJETvjD_i5Nmis",
-          authDomain: "editing-1750c.firebaseapp.com",
-          projectId: "editing-1750c",
-          storageBucket: "editing-1750c.appspot.com",
-          messagingSenderId: "316187910712",
-          appId: "1:316187910712:web:e0be47dbd6e5af30d2fccd",
-          measurementId: "G-78BQD5FHYF"
+         apiKey: "AIzaSyB4qMlzlV0FHsgwGyKBYOJETvjD_i5Nmis",
+         authDomain: "editing-1750c.firebaseapp.com",
+         projectId: "editing-1750c",
+         storageBucket: "editing-1750c.appspot.com",
+         messagingSenderId: "316187910712",
+         appId: "1:316187910712:web:e0be47dbd6e5af30d2fccd",
+         measurementId: "G-78BQD5FHYF"
         };
         
         // <<< YOUR HOME PAGE URL (The "pretty" root URL) >>>
