@@ -10,32 +10,44 @@
     <style>
         /* * ========================================
          * CSS VARIABLES (THEME & TOKENS)
+         * UPDATED: Premium Navy & Conversion Orange Theme
          * ========================================
          */
-      :root {
-            --bg-dark: #0a0f1a; /* Deep navy background */
-            --bg-medium: #1a2035; /* Card background */
-            --bg-light: #2a3045; /* Lighter BG for emphasis */
-            --text-light: #e0e8ff; /* Primary text */
-            --text-medium: #a0aec0; /* Subtitles, muted text */
-            --border-color: #2a3045; /* Borders */
+       :root {
+            /* BACKGROUNDS: Premium/Trustworthy Navy/Indigo */
+            --bg-dark: #0F172A;
+            --bg-medium: #1E293B;
+            --bg-light: #334155;
             
-            --accent-blue: #3a86ff; /* Primary CTA and accent */
-            --accent-blue-hover: #0056e0; /* Hover state for blue */
+            /* TEXT: Clean & Accessible Off-white */
+            --text-light: #F8FAFC;
+            --text-medium: #94A3B8;
             
-            --highlight-yellow: #ffbe0b; /* For "Recommended" tags, urgency bar */
-            --highlight-yellow-dark: #332600; /* Dark text for yellow bg */
+            /* BORDER: Using a medium indigo */
+            --border-color: #334155;
+            
+            /* ACCENT: "Conversion Orange" (was crimson) */
+            --accent-blue: #F97316;          /* Kept name, changed value to orange */
+            --accent-blue-hover: #EA580C;    /* Kept name, changed value to darker orange */
+            
+            /* HIGHLIGHT: A complementary "Premium Gold" */
+            --highlight-yellow: #FACC15;
+            --highlight-yellow-dark: #A16207;
+            
+            /* SEMANTIC */
+            --success-green: #22C55E;
+            --error-red: #EF4444;      /* Kept original */
+            --guarantee-bg: #451A03;    /* Very dark amber/orange for special BG */
 
-            --success-green: #4ade80;
-            --error-red: #f44336;
-            --guarantee-bg: #162a4a;
-
+            /* FONT: System default */
             --font-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
             
-            --shadow-sm: 0 4px 10px rgba(0, 0, 0, 0.2);
-            --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.4);
-            --shadow-blue: 0 8px 25px rgba(58, 134, 255, 0.2);
+            /* SHADOWS: Updated with an orange accent glow */
+            --shadow-sm: 0 4px 10px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.5);
+            --shadow-blue: 0 8px 25px rgba(249, 115, 22, 0.2); /* Kept name, changed value to orange glow */
 
+            /* RADIUS */
             --radius-md: 8px;
             --radius-lg: 12px;
         }
@@ -83,13 +95,13 @@
 
         h1 {
             font-size: clamp(2.5rem, 6vw, 4rem); /* Responsive font size */
-            /* Gradient text for hero headline */
-            background: linear-gradient(90deg, #ffffff, var(--accent-blue), #93c5fd);
+            /* Gradient text for hero headline - UPDATED for full-color Gold-to-Orange theme */
+            background: linear-gradient(90deg, var(--highlight-yellow), var(--accent-blue));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             text-fill-color: transparent;
-            color: var(--text-light); /* Fallback */
+            color: var(--accent-blue); /* Fallback */
         }
 
         h2 {
@@ -166,12 +178,14 @@
         .cta-primary {
             background-color: var(--accent-blue);
             color: #ffffff;
-            box-shadow: 0 4px 15px rgba(58, 134, 255, 0.3);
+            /* UPDATED shadow color to match orange accent */
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
         }
         .cta-primary:hover:not(:disabled), .cta-primary:focus-visible:not(:disabled) {
             background-color: var(--accent-blue-hover);
             transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(58, 134, 255, 0.4);
+            /* UPDATED shadow color to match orange accent */
+            box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
             text-decoration: none;
         }
 
@@ -235,9 +249,8 @@
         .hero {
             padding: 6rem 0 6rem;
             text-align: center;
-            background:
-                radial-gradient(circle at 10% 20%, rgba(58, 134, 255, 0.15), transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(58, 134, 255, 0.1), transparent 40%);
+            /* UPDATED to use a background image */
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('bgimage.png') no-repeat center center/cover;
             min-height: 60vh;
             display: flex;
             align-items: center;
@@ -287,7 +300,7 @@
         }
         .value-box:hover {
             transform: translateY(-5px);
-            box-shadow: var(--shadow-blue);
+            box-shadow: var(--shadow-blue); /* This now uses the orange shadow variable */
         }
         .value-box .icon {
             font-size: 2rem;
@@ -335,7 +348,7 @@
         }
         .price-card:hover {
             transform: translateY(-10px);
-            box-shadow: var(--shadow-blue);
+            box-shadow: var(--shadow-blue); /* This now uses the orange shadow variable */
         }
         .price-card-header {
             text-align: center;
@@ -499,7 +512,8 @@
             border-radius: var(--radius-lg);
             padding: 2rem;
             text-align: center;
-            box-shadow: 0 0 30px rgba(58, 134, 255, 0.2);
+            /* UPDATED shadow color to match orange accent */
+            box-shadow: 0 0 30px rgba(249, 115, 22, 0.2);
         }
         .guarantee-box .icon {
             font-size: 3rem;
@@ -685,7 +699,6 @@
         }
 
     </style>
-
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -757,7 +770,7 @@
                         <p>Start learning immediately. All plans include lifetime access.</p>
                     </div>
                     <div class="pricing-grid">
-                     <div class="price-card recommended">
+                       <div class="price-card recommended">
                             <div class="price-card-header">
                                 <h3>Quick-Start Kit</h3>
                                 <div class="price-wrapper">
@@ -788,10 +801,10 @@
                                 <li>After Effects Tutorials</li>
                                 <li>Complex Tactics</li>
                             </ul>
-                            <a href="https://yeslucideditingcourse.com" 
-                               target="_blank" 
-                               rel="noopener noreferrer" 
-                               class="cta-button cta-secondary">
+                            <a href="https://yeslucideditingcourse.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="cta-button cta-secondary">
                                 Enroll Now
                             </a>
                         </div>
@@ -938,22 +951,22 @@
 
         // <<< STEP 1: YOUR FIREBASE CONFIG >>>
         const FIREBASE_CONFIG = {
-          apiKey: "AIzaSyB4qMlzlV0FHsgwGyKBYOJETvjD_i5Nmis",
-          authDomain: "editing-1750c.firebaseapp.com",
-          projectId: "editing-1750c",
-          storageBucket: "editing-1750c.appspot.com",
-          messagingSenderId: "316187910712",
-          appId: "1:316187910712:web:e0be47dbd6e5af30d2fccd",
-          measurementId: "G-78BQD5FHYF"
+         apiKey: "AIzaSyB4qMlzlV0FHsgwGyKBYOJETvjD_i5Nmis",
+         authDomain: "editing-1750c.firebaseapp.com",
+         projectId: "editing-1750c",
+         storageBucket: "editing-1750c.appspot.com",
+         messagingSenderId: "316187910712",
+         appId: "1:316187910712:web:e0be47dbd6e5af30d2fccd",
+         measurementId: "G-78BQD5FHYF"
         };
         
         // <<< STEP 2: YOUR STRIPE PAYMENT LINKS >>>
         // These are the BASE links without user data
         const BASE_PAYMENT_LINKS = {
-          '5': 'https://buy.stripe.com/3cI5kEfyE2PycH5bIB08g01',
-          '12': 'https://buy.stripe.com/test_7sI8ye7hI6vIfJeeUU',
-          '25': 'https://buy.stripe.com/test_7sI8ye7hI6vIfJeeUU',
-          '100': 'https://buy.stripe.com/test_7sI8ye7hI6vIfJeeUU'
+         '5': 'https://buy.stripe.com/3cI5kEfyE2PycH5bIB08g01',
+         '12': 'https://buy.stripe.com/test_7sI8ye7hI6vIfJeeUU',
+         '25': 'https://buy.stripe.com/test_7sI8ye7hI6vIfJeeUU',
+         '100': 'https://buy.stripe.com/test_7sI8ye7hI6vIfJeeUU'
         };
         
         // This will be updated with the user ID when they log in
@@ -1096,7 +1109,7 @@
                          const paymentLink = `${BASE_PAYMENT_LINKS[pendingPurchasePrice]}?client_reference_id=${userId}`;
                          window.open(paymentLink, '_blank');
                     } else {
-                        console.error("Could not create payment link. User or link missing.");
+                       console.error("Could not create payment link. User or link missing.");
                     }
                     
                     pendingPurchasePrice = null; // Clear the pending purchase
@@ -1240,7 +1253,7 @@
                              console.log(`User ${userId} clicking pay for price ${price}. Link: ${paymentLink}`);
                              window.open(paymentLink, '_blank');
                         } else {
-                            console.error(`Configuration error: No base link for price '${price}'.`);
+                           console.error(`Configuration error: No base link for price '${price}'.`);
                         }
                     } else {
                         // User is NOT signed in, show the modal
@@ -1264,7 +1277,7 @@
             };
             
              allEnrollButtons.forEach(btn => {
-                btn.addEventListener('click', fallbackAction);
+                 btn.addEventListener('click', fallbackAction);
              });
              if (loginBtn) {
                  loginBtn.addEventListener('click', fallbackAction);
