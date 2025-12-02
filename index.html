@@ -654,14 +654,18 @@
         }
         
         /* --- NEW: GOOGLE BUTTON STYLES --- */
+/* --- NEW: GOOGLE BUTTON STYLES --- */
         #google-signin-btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            box-shadow: var(--shadow-blue); 
+            transition: transform 0.2s ease-out;
         }
+        
         #google-signin-btn:hover:not(:disabled), 
         #google-signin-btn:focus-visible:not(:disabled) {
-            box-shadow: var(--shadow-blue); /* This is the orange glow shadow */
+            transform: translateY(-4px);
         }
         
         /* * ========================================
