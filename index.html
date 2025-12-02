@@ -318,11 +318,15 @@
             transform: translateY(-5px);
             box-shadow: var(--shadow-blue); /* This now uses the orange shadow variable */
         }
-        .value-box .icon {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-            color: var(--accent-blue);
-        }
+        
+.value-box .icon {
+  margin-bottom: 0.5rem;
+}
+
+.value-box .icon img {
+  height: 3rem;  /* 48px. Adjust this value to get the size you want */
+  width: auto;   /* Keeps the image from stretching */
+}
         .value-box h3 {
             font-size: 1.2rem;
             margin-bottom: 0.5rem;
@@ -775,23 +779,33 @@
                         <h2>What You'll Be Able to Do</h2>
                         <p>This course is 100% outcome-focused. By completing it, you'll be able to:</p>
                     </div>
-                    <div class="value-stack-grid">
-                        <div class="value-box">
-                            <div class="icon">🎬</div>
-                            <h3>Edit Viral-Style Videos</h3>
-                            <p>Master the cuts, captions, sound design, and pacing that make videos go viral.</p>
-                        </div>
-                        <div class="value-box">
-                            <div class="icon">🎨</div>
-                            <h3>Community</h3>
-                            <p>Access to discord servers. ask questions, learn together</p>
-                        </div>
-                        <div class="value-box">
-                            <div class="icon">📈</div>
-                            <h3>Land Your First Client</h3>
-                            <p>Package your skills, find clients, and start getting paid to edit even as a beginner.</p>
-                        </div>
-                    </div>
+                    
+                  
+<div class="value-stack-grid">
+    <div class="value-box">
+        <div class="icon">
+            <img src="https://raw.githubusercontent.com/Timthetitan01/edit/main/discordicon.png" alt="Viral Video Icon">
+        </div>
+        <h3>Edit Viral-Style Videos</h3>
+        <p>Master the cuts, captions, sound design, and pacing that make videos go viral.</p>
+    </div>
+    <div class="value-box">
+        <div class="icon">
+            <img src="https://raw.githubusercontent.com/Timthetitan01/edit/main/person.png" alt="Community Icon">
+        </div>
+        <h3>Community</h3>
+        <p>Access to discord servers. ask questions, learn together</p>
+    </div>
+    <div class="value-box">
+        <div class="icon">
+            <img src="https://raw.githubusercontent.com/Timthetitan01/edit/main/picon.png" alt="Client Icon">
+        </div>
+        <h3>Land Your First Client</h3>
+        <p>Package your skills, find clients, and start getting paid to edit even as a beginner.</p>
+    </div>
+</div>
+
+                    
                 </div>
             </section>
             
