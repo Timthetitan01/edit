@@ -36,6 +36,7 @@
             
             /* SEMANTIC */
             --success-green: #22C55E;
+            --success-green-hover: #16a34a; /* <-- ADDED HOVER GREEN */
             --error-red: #EF4444;      /* Kept original */
             --guarantee-bg: #451A03;    /* Very dark amber/orange for special BG */
 
@@ -181,14 +182,14 @@
             /* UPDATED shadow color to match orange accent */
             box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
         }
-     .cta-primary:hover:not(:disabled), .cta-primary:focus-visible:not(:disabled) {
-    background-color: var(--accent-blue-hover);
-    transform: translateY(-3px);
-    /* UPDATED shadow color to match orange accent */
-    box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
-    text-decoration: none;
-    color: #ffffff; /* <-- ADD THIS LINE to keep text white on hover */
-}
+       .cta-primary:hover:not(:disabled), .cta-primary:focus-visible:not(:disabled) {
+           background-color: var(--accent-blue-hover);
+           transform: translateY(-3px);
+           /* UPDATED shadow color to match orange accent */
+           box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
+           text-decoration: none;
+           color: #ffffff; /* <-- This fix keeps text white on hover */
+       }
 
         .cta-secondary {
             background-color: transparent;
@@ -201,6 +202,20 @@
             text-decoration: none;
             transform: translateY(-3px);
         }
+
+        /* --- NEW: GREEN HERO BUTTON --- */
+        .cta-hero-join {
+            background-color: var(--success-green);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+        }
+        .cta-hero-join:hover:not(:disabled), .cta-hero-join:focus-visible:not(:disabled) {
+            background-color: var(--success-green-hover);
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+            color: #ffffff;
+            transform: translateY(-3px);
+        }
+
 
         /* * ========================================
          * SECTION: TOP NAVIGATION (SHARED)
@@ -243,14 +258,14 @@
             font-size: 0.9rem;
          }
 
-       /* * ========================================
+        /* * ========================================
          * SECTION: HERO (SALES PAGE)
          * ========================================
          */
         .hero {
             padding: 6rem 0 6rem;
             text-align: center;
-            /* UPDATED to use the FULL RAW GITHUB URL */
+            /* UPDATED to use a background image */
             background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://raw.githubusercontent.com/timthetitan01/edit/main/bgimage.png') no-repeat center center/cover;
             min-height: 60vh;
             display: flex;
@@ -638,6 +653,17 @@
             min-height: 1.2em;
         }
         
+        /* --- NEW: GOOGLE BUTTON STYLES --- */
+        #google-signin-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #google-signin-btn:hover:not(:disabled), 
+        #google-signin-btn:focus-visible:not(:disabled) {
+            box-shadow: var(--shadow-blue); /* This is the orange glow shadow */
+        }
+        
         /* * ========================================
          * (REMOVED) COURSE PAGE STYLES
          * ========================================
@@ -700,6 +726,7 @@
         }
 
     </style>
+
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -727,7 +754,7 @@
                     even if you've never used editing software before.
                 </p>
                 <div class="hero-cta-group">
-                    <a href="#plans" class="cta-button cta-primary">
+                    <a href="#plans" class="cta-button cta-primary cta-hero-join">
                         Join Now — Only $5
                     </a>
                     <a href="#plans" class="cta-button cta-secondary enroll-btn" data-plan="Creator Fast-Track" data-price="5">
@@ -923,7 +950,10 @@
                     </div>
                 </form>
                 <div style="margin-bottom:1rem;">
-                    <button id="google-signin-btn" class="cta-button cta-secondary">Continue with Google</button>
+                    <button id="google-signin-btn" class="cta-button cta-secondary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 0.75rem;"><path d="M22.56 12.25C22.56 11.45 22.49 10.68 22.36 9.94H12.27V14.4H18.23C18.01 15.86 17.32 17.11 16.29 17.82V20.26H19.78C21.56 18.67 22.56 16.14 22.56 12.25Z" fill="#4285F4"></path><path d="M12.27 23C15.02 23 17.33 22.05 19.03 20.48L16.29 17.82C15.34 18.45 14.05 18.86 12.27 18.86C9.83 18.86 7.73 17.28 6.9 15.11H3.3V17.9C4.98 20.95 8.35 23 12.27 23Z" fill="#34A853"></path><path d="M6.9 15.11C6.66 14.44 6.51 13.72 6.51 13C6.51 12.28 6.66 11.56 6.9 10.89V8.1H3.3C2.39 10.03 1.87 12.25 1.87 13C1.87 13.75 2.39 15.97 3.3 17.9L6.9 15.11Z" fill="#FBBC05"></path><path d="M12.27 7.14C13.75 7.14 15.1 7.64 16.13 8.6L19.12 5.62C17.33 4.02 15.02 3 12.27 3C8.35 3 4.98 5.05 3.3 8.1L6.9 10.89C7.73 8.72 9.83 7.14 12.27 7.14Z" fill="#EA4335"></path></svg>
+                        Continue with Google
+                    </button>
                 </div>
                 <div id="auth-status"></div>
             </div>
